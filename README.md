@@ -1,2 +1,3 @@
-# bitcraft-recipe-manager
-A web app to handle bitcraft resource needs
+# BitCraft Recipe Manager
+
+A web app to handle bitcraft resource needs.
