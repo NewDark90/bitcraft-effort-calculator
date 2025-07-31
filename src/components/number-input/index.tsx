@@ -1,25 +1,32 @@
 import * as React from 'react';
 import { NumberField } from '@base-ui-components/react/number-field';
+import { clsx } from 'clsx';
 import styles from './index.module.css';
 
 export type NumberInputProps = {
-    defaultValue?: number,
-    onInput?: (current: number | null) => void,
+    defaultValue?: number;
+    readOnly?: boolean;
+    onInput?: (current: number | null) => void;
 }
 
 export default function NumberInput(
-    { defaultValue, onInput }: NumberInputProps
+    { defaultValue, onInput, readOnly }: NumberInputProps
 ) {
     const id = React.useId();
     return (
-        <NumberField.Root id={ id } defaultValue={ defaultValue } className={ styles.Field } onValueChange={(ev) => onInput?.(ev)}>
+        <NumberField.Root id={ id } 
+            defaultValue={ defaultValue } 
+            className={ styles.Field } 
+            onValueChange={(ev) => onInput?.(ev)} 
+            readOnly={readOnly ?? false}
+        >
             <NumberField.Group className={ styles.Group }>
-                <NumberField.Decrement className={ styles.Decrement }>
+                <NumberField.Decrement className={ clsx(styles.Decrement, readOnly && "invisible") }>
                     <MinusIcon />
                 </NumberField.Decrement>
                 <NumberField.Input
                     className={ styles.Input } />
-                <NumberField.Increment className={ styles.Increment }>
+                <NumberField.Increment className={ clsx(styles.Increment, readOnly && "invisible") }>
                     <PlusIcon />
                 </NumberField.Increment>
             </NumberField.Group>
