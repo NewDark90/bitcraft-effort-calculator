@@ -4,19 +4,20 @@ import { clsx } from 'clsx';
 import styles from './index.module.css';
 
 export type NumberInputProps = {
-    defaultValue?: number;
+    value?: number;
     readOnly?: boolean;
     onInput?: (current: number | null) => void;
+    className?: string;
 }
 
 export default function NumberInput(
-    { defaultValue, onInput, readOnly }: NumberInputProps
+    { value, onInput, readOnly, className }: NumberInputProps
 ) {
     const id = React.useId();
     return (
         <NumberField.Root id={ id } 
-            defaultValue={ defaultValue } 
-            className={ styles.Field } 
+            value={ value } 
+            className={ `${styles.Field} ${className ?? ""}` } 
             onValueChange={(ev) => onInput?.(ev)} 
             readOnly={readOnly ?? false}
         >
