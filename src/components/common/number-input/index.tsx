@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NumberField } from '@base-ui-components/react/number-field';
 import { clsx } from 'clsx';
+import './index.theme.css';
 import styles from './index.module.css';
 
 export type NumberInputProps = {

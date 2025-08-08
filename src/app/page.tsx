@@ -1,16 +1,16 @@
 'use client'
 
-import NumberInput from "@/components/number-input";
+import NumberInput from "@/components/common/number-input";
 import SkillArmorButton from "@/components/skill-armor-button";
 import SkillIcon from "@/components/skill-icon";
 import SkillSelectButton from "@/components/skill-select-button";
-import NoSsr from '@mui/material/NoSsr';
+import { NoSSR } from 'next-dynamic-no-ssr';
 import Image from "next/image";
 
 export default function Home() {
 
     return (
-        <NoSsr>
+        <NoSSR>
             <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
                 <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
 
@@ -83,6 +83,6 @@ export default function Home() {
                     </a>
                 </footer>
             </div>
-        </NoSsr>
+        </NoSSR>
     );
 }
