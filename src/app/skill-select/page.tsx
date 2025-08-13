@@ -3,25 +3,19 @@
 import Skill from "@/app/skill-select/skill";
 import { professions } from "@/config/professions";
 import { skills } from "@/config/skills";
-import { SkillService } from "@/services/skill-service";
+import { skillService } from "@/services/skill-service";
 import { NoSSR } from 'next-dynamic-no-ssr';
 import { useState } from "react";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Link from "next/link";
+import { SkillEntity } from "@/database/entities";
+import { useLiveQuery } from "dexie-react-hooks";
+import { calculatorDatabase } from "@/database/db";
 
-
-const skillService = new SkillService();
 
 export default function SkillSelect() {
 
-    const [selectedSkill, setSelectedSkill] = useState(() => skillService.getSelectedSkill());
-    
-    const updateSelectedSkill = (skill: string | null) => {
-        if (skill) {
-            setSelectedSkill(skill);
-            skillService.setSelectedSkill(skill);
-        }
-    }
+    const skills = useLiveQuery(async () => await skillService.getSkills());
 
     const titleCss = "my-6 text-2xl text-center font-bold leading-none tracking-tight text-gray-950 md:text-3xl lg:text-4xl";
 
@@ -44,16 +38,16 @@ export default function SkillSelect() {
                         </h2>
                         <div className="grid grid-cols-4 gap-4">
                         {
-                            professions.map(profession => (
-                                <Skill 
-                                    key={profession} 
-                                    name={profession}
-                                    selectedSkill={selectedSkill}
-                                    onSelectedSkillChange={updateSelectedSkill}
-                                    className="">
+                            skills
+                                ?.filter(skill => skill.type == 'profession')
+                                .map(profession => (
+                                    <Skill 
+                                        key={profession.id} 
+                                        skill={profession}
+                                        className="">
 
-                                </Skill>
-                            ))
+                                    </Skill>
+                                ))
                         }
                         </div>
                     </section>
@@ -64,15 +58,15 @@ export default function SkillSelect() {
                         </h2>
                         <div className="grid grid-cols-4 gap-4">
                         {
-                            skills.map(skill => (
-                                <Skill 
-                                    key={skill} 
-                                    name={skill} 
-                                    selectedSkill={selectedSkill}
-                                    onSelectedSkillChange={updateSelectedSkill}
-                                    className="">    
-                                </Skill>
-                            ))
+                            skills
+                                ?.filter(skill => skill.type == 'skill')
+                                .map(skill => (
+                                    <Skill 
+                                        key={skill.id} 
+                                        skill={skill} 
+                                        className="">    
+                                    </Skill>
+                                ))
                         }
                         </div>
                     </section>

@@ -4,10 +4,15 @@ import NumberInput from "@/components/common/number-input";
 import SkillArmorButton from "@/components/skill-armor-button";
 import SkillIcon from "@/components/skill-icon";
 import SkillSelectButton from "@/components/skill-select-button";
+import { skillService } from "@/services/skill-service";
+import { useLiveQuery } from "dexie-react-hooks";
 import { NoSSR } from 'next-dynamic-no-ssr';
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Home() {
+
+    const selectedSkill = useLiveQuery(async () => await skillService.getSelectedSkill());
 
     return (
         <NoSSR>
@@ -20,26 +25,12 @@ export default function Home() {
 
                     <div className="flex gap-4 items-center justify-evenly flex-col sm:flex-row [&>*]:grow [&>*]:basis-0">
 
-                        <SkillSelectButton power={ 12 } skill="Hunting"></SkillSelectButton>
+                        <SkillSelectButton power={ selectedSkill?.power } skill={selectedSkill?.name}></SkillSelectButton>
 
                         <SkillArmorButton energy={ 400 } interval={ 1.24 }></SkillArmorButton>
 
                     </div>
 
-                    <NumberInput
-                        value={ 55 }
-                        onInput={ (cur) => console.log(cur) }
-                        readOnly={ true }
-                    >
-
-                    </NumberInput>
-
-                    <SkillIcon
-                        name="Hunting"
-                        size={ 32 }
-                    >
-
-                    </SkillIcon>
                 </main>
                 <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
                     <a

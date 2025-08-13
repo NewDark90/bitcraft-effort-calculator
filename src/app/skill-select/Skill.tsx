@@ -2,56 +2,58 @@
 
 import NumberInput from "@/components/common/number-input";
 import SkillIcon from "@/components/skill-icon";
-import { SkillService } from "@/services/skill-service";
+import { skillService } from "@/services/skill-service";
 import { useState } from "react";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckIcon from '@mui/icons-material/Check';
+import { SkillEntity } from "@/database/entities";
 
 
 export type SkillProps = { 
-    name: string;
-    selectedSkill: string | null;
+    skill: SkillEntity;
     className?: string;
-    onSelectedSkillChange?: (skill: string | null) => void;
+    onSelectedSkillChange?: (skill: SkillEntity) => void;
 };
 
-const skillService = new SkillService();
-
 export default function Skill(
-    { name, className, selectedSkill, onSelectedSkillChange }: SkillProps
+    { skill, className, onSelectedSkillChange }: SkillProps
 ) {
 
-    const [power, setPower] = useState(() => skillService.getSkillPower(name));
     const updatePower = (powerNum: number | null) => {
         if (powerNum) {
-            setPower(powerNum);
-            skillService.setSkillPower(name, powerNum);
+            skill.power = powerNum;
+            skillService.setSkill(skill, skill.id);
+        }
+    }
+
+    const updateSelectedSkill = async (skill: SkillEntity | undefined) => {
+        if (skill) {
+            await skillService.setSelectedSkill(skill);
         }
     }
 
     let wrapperClass = `flex flex-col text-center items-center ${className}`;
-    const isSelected = (name == selectedSkill);
     const selectedClass = `text-green-500`;
 
     return (
         <div className={ wrapperClass }>
             <div className="flex flex-row items-center justify-evenly [&>*]:mx-1 mx-2 cursor-pointer"
-                onClick={() => onSelectedSkillChange?.(name)}>
-                <SkillIcon name={ name } size={ 32 }></SkillIcon>
-                <span className={isSelected ? selectedClass : ""}>
-                    { name }
+                onClick={() => updateSelectedSkill(skill)}>
+                <SkillIcon name={ skill.name } size={ 32 }></SkillIcon>
+                <span className={skill.selected ? selectedClass : ""}>
+                    { skill.name }
                 </span>
                 {
-                    name == selectedSkill 
-                        ? <CheckIcon fontSize={"small"} className={isSelected ? selectedClass : ""} />
+                    skill.selected 
+                        ? <CheckIcon fontSize={"small"} className={skill.selected ? selectedClass : ""} />
                         : <CheckBoxOutlineBlankIcon fontSize={"small"} /> /*<span className={`w-[24px] block`}></span>*/
                 }
             </div>
 
             <NumberInput 
                 className="my-2"
-                value={power} 
-                onInput={updatePower}>
+                value={skill.power} 
+                onValueChange={updatePower}>
 
             </NumberInput>
         </div>

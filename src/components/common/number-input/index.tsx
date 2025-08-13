@@ -7,21 +7,27 @@ import styles from './index.module.css';
 export type NumberInputProps = {
     value?: number;
     readOnly?: boolean;
-    onInput?: (current: number | null) => void;
+    label?: string;
     className?: string;
-}
+} & NumberField.Root.Props
 
 export default function NumberInput(
-    { value, onInput, readOnly, className }: NumberInputProps
+    { value, onInput, readOnly, className, label, ...props }: NumberInputProps
 ) {
     const id = React.useId();
     return (
-        <NumberField.Root id={ id } 
+        <NumberField.Root 
+            { ...props }
+            id={ id } 
             value={ value } 
             className={ `${styles.Field} ${className ?? ""}` } 
-            onValueChange={(ev) => onInput?.(ev)} 
             readOnly={readOnly ?? false}
         >
+            {
+                label && <label htmlFor={id} className={styles.Label}>
+                    {label}
+                </label>
+            }
             <NumberField.Group className={ styles.Group }>
                 <NumberField.Decrement className={ clsx(styles.Decrement, readOnly && "invisible") }>
                     <MinusIcon />

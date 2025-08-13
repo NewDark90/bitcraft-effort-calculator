@@ -1,10 +1,10 @@
 import Image from "next/image";
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 
-export type SkillIconProps = { name?: string, size?: number };
+export type SkillIconProps = { name?: string, size?: number, className?: string };
 
 export default function SkillIcon(
-    { name, size = 16 }: SkillIconProps
+    { name, size = 16, className }: SkillIconProps
 ) {
 
     return (
@@ -15,6 +15,7 @@ export default function SkillIcon(
                 alt={`${name} icon`}
                 width={ size }
                 height={ size }
+                className={ className }
             />
             : <PanoramaFishEyeIcon />
     );

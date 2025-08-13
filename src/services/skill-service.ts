@@ -1,46 +1,59 @@
-export interface SkillDetail {
-    name: string;
-    power: number;
-}
+import { calculatorDatabase } from "@/database/db";
+import { SkillEntity, SkillEntityType } from "@/database/entities";
 
 export class SkillService {
 
-    private getSkillPowerKey = (name: string): string => `skill.${name?.toLocaleLowerCase()}.power`;
-
-    getSkillPower(name: string): number {
-        const storageKey = this.getSkillPowerKey(name);
-        const powerStr = localStorage.getItem(storageKey);
-        const power = parseInt(powerStr ?? "");
-        if (isNaN(power)) {
-            return 8;
-        }
-        return power;
+    getDefaultSkill(name: string, type: SkillEntityType): SkillEntity {
+        return {
+            id: name.toLocaleLowerCase(),
+            name,
+            power: 8,
+            selected: 1,
+            type: type
+        };
     }
 
-    setSkillPower(name: string, power?: number) {
-        const storageKey = this.getSkillPowerKey(name);
-        if(power == null) {
-            localStorage.removeItem(storageKey);
-        }
-
-        localStorage.setItem(storageKey, `${power}`);
+    async getSkills(): Promise<SkillEntity[]> {
+        const skills = await calculatorDatabase.skills.toArray();
+        return skills;
     }
 
-    private getSelectedSkillKey = (): string => `skill.selected`;
-
-    getSelectedSkill(): string | null {
-        const storageKey = this.getSelectedSkillKey();
-        const skill = localStorage.getItem(storageKey);
+    async getSkill(name: string): Promise<SkillEntity | undefined> {
+        const skill = await calculatorDatabase.skills.get(name.toLocaleLowerCase());
         return skill;
     }
 
-    setSelectedSkill(name: string | null) {
-        const storageKey = this.getSelectedSkillKey();
-        if(name == null) {
-            localStorage.removeItem(storageKey);
+    async setSkill(skill: SkillEntity, skillId: string) {
+        if (skill == null) {
+            return;
+        }
+        await calculatorDatabase.skills.put(skill, skillId)
+    }
+
+    async deleteSkill(skillId: string) {
+        await calculatorDatabase.skills.delete(skillId);
+    }
+
+    async getSelectedSkill(): Promise<SkillEntity | undefined> {
+        const selectedSkill = await calculatorDatabase.skills.get({selected: 1})   
+        return selectedSkill;
+    }
+
+    async setSelectedSkill(skill: SkillEntity) {
+        if (skill == null) {
+            return;
         }
 
-        localStorage.setItem(storageKey, `${name}`);
+        const selectedSkills = await calculatorDatabase.skills.where({selected: 1}).toArray();
+        for (const selectedSkill of selectedSkills) {
+            selectedSkill.selected = 0;
+            await calculatorDatabase.skills.put(selectedSkill);
+        }
+
+        skill.selected = 1;
+        await calculatorDatabase.skills.put(skill);
     }
     
 }
+
+export const skillService = new SkillService();

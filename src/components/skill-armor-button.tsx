@@ -12,10 +12,13 @@ export default function SkillArmorButton(
 
     const iconSize = 32;
 
+    const buttonClasses = "flex flex-wrap items-center justify-evenly";
+
     return (
         <ButtonLink
             href="/armor-select"
             rel="noopener noreferrer"
+            className={buttonClasses}
         >
             <span className="w-full">
                 Armor Power
@@ -31,8 +34,7 @@ export default function SkillArmorButton(
                     width={ 24 }
                     height={ 24 }
                 />
-                <span className="mx-2"
-                >
+                <span className="mx-2">
                     {interval}
                 </span>
             </div>
@@ -40,8 +42,7 @@ export default function SkillArmorButton(
             <div className="grow flex justify-center items-center">
                 <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
                 {/*<SquareIcon htmlColor="var(--energy, yellow)" className="bg-white" viewBox="2 2 20 20"></SquareIcon>*/}
-                <span className="mx-2"
-                >
+                <span className="mx-2">
                     {energy}
                 </span>
             </div>
