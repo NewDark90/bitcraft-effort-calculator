@@ -1,15 +1,15 @@
 'use client'
 
 import NumberInput from "@/components/common/number-input";
-import SkillIcon from "@/components/skill-icon";
 import { useState } from "react";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckIcon from '@mui/icons-material/Check';
 import { ArmorDetail, armorService } from "@/services/armor-service";
 import { ArmorEntity } from "@/database/entities";
-import { useLiveQuery } from "dexie-react-hooks";
 import { Button, TextField } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+import SkillIcon from "@/components/skill-icon";
 
 
 export type ArmorProps = { 
@@ -43,38 +43,44 @@ export default function Armor(
         }
     }
 
-    let wrapperClass = `flex flex-col text-center items-center ${className}`;
+    let wrapperClass = `flex flex-row text-center items-center justify-center w-full [&>*]:mx-2 ${className}`;
     const selectedClass = `text-green-500`;
 
     return (
         <div className={ wrapperClass }>
-            <div className="flex flex-row items-center justify-evenly [&>*]:mx-1 mx-2 cursor-pointer"
-                onClick={() => updateSelectedArmor(armor)}>
-                <span className={armor.selected ? selectedClass : ""}>
-                    { armor.name }
-                </span>
+            
+            <Button variant="outlined"
+                size="large"
+                color={ armor.selected ? "success" : "inherit" }
+                onClick={() => updateSelectedArmor(armor)}
+            >
                 {
                     armor.selected
                         ? <CheckIcon fontSize={"small"} className={armor.selected ? selectedClass : ""} />
                         : <CheckBoxOutlineBlankIcon fontSize={"small"} /> /*<span className={`w-[24px] block`}></span>*/
                 }
+            </Button>
                 
-                <TextField 
-                    label="Armor Name" 
-                    variant="standard" 
-                    className={armor.selected ? selectedClass : ""}
-                    defaultValue={armorName} 
-                    onChange={(event) => {
-                        armor.name = event.target.value;
-                        setArmorName(armor.name);
-                        onArmorChange?.(armor);
-                    }} />
-            </div>
+            <TextField 
+                label="Armor Name" 
+                variant="standard" 
+                className={armor.selected ? selectedClass : ""}
+                value={armorName}
+                onChange={(event) => {
+                    armor.name = event.target.value;
+                    setArmorName(armor.name);
+                    onArmorChange?.(armor);
+                }} />
 
             <NumberInput 
                 className="my-2"
                 value={armor.energy}
-                label="Energy"
+                label={
+                    <span>
+                        <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
+                        Energy
+                    </span>
+                }
                 step={1}
                 onValueChange={() => {}}>
 
@@ -83,7 +89,17 @@ export default function Armor(
             <NumberInput 
                 className="my-2"
                 value={armor.interval} 
-                label="Interval"
+                label={
+                    <span>
+                        <SkillIcon 
+                            folder="/other" 
+                            name="Interval" 
+                            size={24}
+                            className="invert-0 dark:invert inline-block"
+                        ></SkillIcon>
+                        Interval
+                    </span>
+                }
                 step={0.01}
                 format={{
                     minimumFractionDigits: 2,
@@ -96,13 +112,23 @@ export default function Armor(
             <NumberInput 
                 className="my-2"
                 value={armor.regenPerSecond} 
-                label="Energy Regen"
+                label={
+                    <span>
+                        <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
+                        Regeneration
+                    </span>
+                }
                 step={1}
                 onValueChange={() => {}}>
 
             </NumberInput>
 
-            <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon />}>
+            <Button 
+                variant="outlined" 
+                color="error"
+                className="my-2 self-end" 
+                startIcon={<DeleteForeverIcon />}
+                >
                 Delete
             </Button>
         </div>

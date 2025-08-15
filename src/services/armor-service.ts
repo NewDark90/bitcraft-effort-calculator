@@ -54,11 +54,11 @@ export class ArmorService {
         const selectedArmors = await calculatorDatabase.armors.where({selected: 1}).toArray();
         for (const selectedArmor of selectedArmors) {
             selectedArmor.selected = 0;
-            await calculatorDatabase.armors.put(selectedArmor);
         }
 
         armor.selected = 1;
-        await calculatorDatabase.armors.put(armor);
+        
+        await calculatorDatabase.armors.bulkPut([...selectedArmors, armor]);
     }
     
 }

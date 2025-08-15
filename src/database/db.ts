@@ -2,7 +2,7 @@
 import { professions } from '@/config/professions';
 import { skills } from '@/config/skills';
 import { ArmorEntity, SkillEntity } from '@/database/entities';
-import { initializeSkills } from '@/database/init';
+import { initializeArmor, initializeSkills } from '@/database/init';
 import { skillService } from '@/services/skill-service';
 import Dexie, { type EntityTable } from 'dexie';
 
@@ -46,6 +46,7 @@ calculatorDatabase.version(1).stores({
 calculatorDatabase.on("ready", async (vipDb) => {
 
     await initializeSkills(vipDb as BitcraftCalculatorDatabase);
+    await initializeArmor(vipDb as BitcraftCalculatorDatabase);
     
 })
 

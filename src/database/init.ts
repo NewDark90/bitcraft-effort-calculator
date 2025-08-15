@@ -1,7 +1,7 @@
 import { professions } from "@/config/professions";
 import { skills } from "@/config/skills";
 import { BitcraftCalculatorDatabase } from "@/database/db";
-import { SkillEntity } from "@/database/entities";
+import { ArmorEntity, SkillEntity } from "@/database/entities";
 import { skillService } from "@/services/skill-service";
 
 export const initializeSkills = async (db: BitcraftCalculatorDatabase) => {
@@ -29,25 +29,27 @@ export const initializeSkills = async (db: BitcraftCalculatorDatabase) => {
 
 export const initializeArmor = async (db: BitcraftCalculatorDatabase) => {
 
-    
-    const allCurrentSkills = await db.skills.toArray();
+    const allCurrentArmors = await db.armors.toArray();
 
-    const skillMap = new Map<string, SkillEntity>();
-
-    // Set defaults initially.
-    for (const skill of skills) {
-        const defaultSkill = skillService.getDefaultSkill(skill, 'skill');
-        skillMap.set(defaultSkill.id, defaultSkill);
-    }
-    for (const profession of professions) {
-        const defaultProfession = skillService.getDefaultSkill(profession, 'profession');
-        skillMap.set(defaultProfession.id, defaultProfession);
+    if (allCurrentArmors.length) {
+        return;
     }
 
-    //Overwrite the map with real data if exists.
-    for (const currentSkill of allCurrentSkills) {
-        skillMap.set(currentSkill.id, currentSkill);
-    }
+    const armors: Omit<ArmorEntity, "id">[] = [
+        {
+            name: "Cloth",
+            selected: 1,
+            energy: 100,
+            interval: 1.6,
+            regenPerSecond: 5
+        }, {
+            name: "Leather",
+            selected: 0,
+            energy: 100,
+            interval: 1.6,
+            regenPerSecond: 5
+        }
+    ];
 
-    await db.skills.bulkPut(skillMap.values().toArray());
+    await db.armors.bulkAdd(armors)
 }

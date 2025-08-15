@@ -47,11 +47,11 @@ export class SkillService {
         const selectedSkills = await calculatorDatabase.skills.where({selected: 1}).toArray();
         for (const selectedSkill of selectedSkills) {
             selectedSkill.selected = 0;
-            await calculatorDatabase.skills.put(selectedSkill);
         }
 
         skill.selected = 1;
-        await calculatorDatabase.skills.put(skill);
+        
+        await calculatorDatabase.skills.bulkPut([...selectedSkills, skill]);
     }
     
 }

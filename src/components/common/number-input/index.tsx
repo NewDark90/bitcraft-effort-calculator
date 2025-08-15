@@ -7,7 +7,7 @@ import styles from './index.module.css';
 export type NumberInputProps = {
     value?: number;
     readOnly?: boolean;
-    label?: string;
+    label?: string | React.ReactElement;
     className?: string;
 } & NumberField.Root.Props
 

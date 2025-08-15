@@ -1,8 +1,7 @@
 import Image from "next/image";
-import SquareIcon from '@mui/icons-material/Square';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import Link from 'next/link'
 import ButtonLink from "@/components/common/button-link";
+import SkillIcon from "@/components/skill-icon";
 
 export type SkillArmorButtonProps = { interval: number, energy: number };
 
@@ -26,14 +25,12 @@ export default function SkillArmorButton(
 
 
             <div className="grow flex justify-center items-center"> 
-                <Image
-                    aria-hidden
-                    className="invert-0 dark:invert"
-                    src={`/skills/other/interval.svg`}
-                    alt={`Interval icon`}
-                    width={ 24 }
-                    height={ 24 }
-                />
+                <SkillIcon 
+                    folder="/other" 
+                    name="Interval" 
+                    size={24}
+                    className="invert-0 dark:invert inline-block"
+                ></SkillIcon>
                 <span className="mx-2">
                     {interval}
                 </span>
