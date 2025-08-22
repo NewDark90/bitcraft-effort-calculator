@@ -53,6 +53,7 @@ export default function Skill(
             <NumberInput 
                 className="my-2"
                 value={skill.power} 
+                min={0}
                 onValueChange={updatePower}>
 
             </NumberInput>

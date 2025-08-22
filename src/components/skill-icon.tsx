@@ -12,8 +12,6 @@ export default function SkillIcon(
     { name, size = 16, folder = "", className }: SkillIconProps
 ) {
 
-
-
     return (
         name && name != "" ?
             <Image

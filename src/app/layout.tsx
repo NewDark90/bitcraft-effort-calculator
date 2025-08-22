@@ -3,17 +3,18 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { createTheme, Palette, Theme, ThemeProvider } from "@mui/material";
+import { ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { muiTheme } from "@/app/mui-theme";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+    variable: "--font-geist-sans",
+    subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+    variable: "--font-geist-mono",
+    subsets: ["latin"],
 });
 
 /*
@@ -23,36 +24,22 @@ export const metadata: Metadata = {
 };
 */
 
-
-
-const theme = createTheme({
-    cssVariables: true,
-    palette: {
-        text: {
-            primary: 'var(--foreground)',
-            secondary: 'var(--color-gray-600)',
-            disabled: 'var(--color-gray-300)',
-        },
-        
-    }
-});
-
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider theme={theme}>
-                {children}
-            </ThemeProvider>
-        </AppRouterCacheProvider>
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body
+                className={ `${ geistSans.variable } ${ geistMono.variable } antialiased` }
+            >
+                <AppRouterCacheProvider options={ { enableCssLayer: true } }>
+                    <ThemeProvider theme={ muiTheme }>
+                        { children }
+                    </ThemeProvider>
+                </AppRouterCacheProvider>
+            </body>
+        </html>
+    );
 }

@@ -2,11 +2,15 @@ import Image from "next/image";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import ButtonLink from "@/components/common/button-link";
 import SkillIcon from "@/components/skill-icon";
+import { ArmorEntity } from "@/database/entities";
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 
-export type SkillArmorButtonProps = { interval: number, energy: number };
+export type ArmorSelectButtonProps = { 
+    armor?: ArmorEntity,
+};
 
-export default function SkillArmorButton(
-    { interval, energy }: SkillArmorButtonProps
+export default function ArmorSelectButton(
+    { armor }: ArmorSelectButtonProps
 ) {
 
     const iconSize = 32;
@@ -23,6 +27,17 @@ export default function SkillArmorButton(
                 Armor Power
             </span>
 
+            <span className="w-full">
+                { armor?.name }
+            </span>
+
+
+            <div className="grow flex justify-center items-center">
+                <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
+                <span className="mx-2">
+                    {armor?.energy ?? 0}
+                </span>
+            </div>
 
             <div className="grow flex justify-center items-center"> 
                 <SkillIcon 
@@ -32,15 +47,14 @@ export default function SkillArmorButton(
                     className="invert-0 dark:invert inline-block"
                 ></SkillIcon>
                 <span className="mx-2">
-                    {interval}
+                    {armor?.interval ?? 0}
                 </span>
             </div>
 
             <div className="grow flex justify-center items-center">
-                <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
-                {/*<SquareIcon htmlColor="var(--energy, yellow)" className="bg-white" viewBox="2 2 20 20"></SquareIcon>*/}
+                <AutorenewIcon htmlColor="var(--energy, yellow)"></AutorenewIcon>
                 <span className="mx-2">
-                    {energy}
+                    {armor?.regenPerSecond ?? 0}
                 </span>
             </div>
            

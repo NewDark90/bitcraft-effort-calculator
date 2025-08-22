@@ -1,22 +1,17 @@
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity } from "@/database/entities";
 import { tryParseJson } from "@/util/tryParseJson";
-
-export interface ArmorDetail {
-    name: string;
-    energy: number;
-    interval: number;
-    regenPerSecond: number;
-}
+import { InsertType } from "dexie";
 
 export class ArmorService {
 
-    getDefaultArmorDetail(name: string): ArmorDetail {
+    getDefaultArmorDetail(): Omit<ArmorEntity, "id"> {
         return {
-            name,
+            name: "",
             energy: 100,
             interval: 1.6,
-            regenPerSecond: 0
+            regenPerSecond: 0,
+            selected: 0
         };
     }
 
@@ -28,6 +23,22 @@ export class ArmorService {
     async getArmor(id: number): Promise<ArmorEntity | undefined> {
         const armor = await calculatorDatabase.armors.get(id);
         return armor;
+    }
+
+    async createNewArmor(armorDetails?: Partial<ArmorEntity>): Promise<ArmorEntity> {
+        const newArmor = {
+            ...this.getDefaultArmorDetail(),
+            ...armorDetails
+        };
+        const id = await calculatorDatabase.armors.add(newArmor);
+        return {
+            ...newArmor,
+            id: id
+        }
+    }
+
+    async createArmor(armor: InsertType<ArmorEntity, "id">) {
+        await calculatorDatabase.armors.add(armor);
     }
 
     async setArmor(armor: ArmorEntity, armorId: number) {
@@ -57,7 +68,7 @@ export class ArmorService {
         }
 
         armor.selected = 1;
-        
+
         await calculatorDatabase.armors.bulkPut([...selectedArmors, armor]);
     }
     

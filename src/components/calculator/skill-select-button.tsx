@@ -1,11 +1,12 @@
 import ButtonLink from "@/components/common/button-link";
 import SkillIcon from "@/components/skill-icon";
+import { SkillEntity } from "@/database/entities";
 import Image from "next/image";
 
-export type SkillSelectButtonProps = { power?: number, skill?: string };
+export type SkillSelectButtonProps = { skill?: SkillEntity };
 
 export default function SkillSelectButton(
-    { power, skill }: SkillSelectButtonProps
+    { skill }: SkillSelectButtonProps
 ) {
 
     const iconSize = 32;
@@ -31,15 +32,15 @@ export default function SkillSelectButton(
                     width={ 24 }
                     height={ 24 }
                 />
-                <span className="mx-2">{power ?? 0}</span>
+                <span className="mx-2">{skill?.power ?? 0}</span>
             </div>
 
             <div className="grow flex justify-center items-center">
                 <SkillIcon 
-                    name={ skill } 
+                    name={ skill?.name } 
                     size={ iconSize } 
                 ></SkillIcon>
-                <span className="mx-2">{skill ?? "[Select Skill]"}</span>
+                <span className="mx-2">{skill?.name ?? "[Select Skill]"}</span>
             </div>
         </ButtonLink>
     );

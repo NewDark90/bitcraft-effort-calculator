@@ -1,18 +1,26 @@
 'use client'
 
 import NumberInput from "@/components/common/number-input";
-import SkillArmorButton from "@/components/skill-armor-button";
+import ArmorSelectButton from "@/components/calculator/armor-select-button";
 import SkillIcon from "@/components/skill-icon";
-import SkillSelectButton from "@/components/skill-select-button";
+import SkillSelectButton from "@/components/calculator/skill-select-button";
+import { armorService } from "@/services/armor-service";
 import { skillService } from "@/services/skill-service";
 import { useLiveQuery } from "dexie-react-hooks";
 import { NoSSR } from 'next-dynamic-no-ssr';
 import Image from "next/image";
 import { useState } from "react";
+import CraftParameters from "@/components/calculator/craft-parameters";
+import { craftParameterService } from "@/services/craft-parameter-service";
 
 export default function Home() {
 
     const selectedSkill = useLiveQuery(async () => await skillService.getSelectedSkill());
+    const selectedArmor = useLiveQuery(async () => await armorService.getSelectedArmor());
+
+    const [fullEffort, setFullEffort] = useState(craftParameterService.getEffort());
+    const [craftingType, setCraftingType] = useState(craftParameterService.getCraftingType());
+
 
     return (
         <NoSSR>
@@ -23,13 +31,25 @@ export default function Home() {
                         Bitcraft Online Effort Calculator
                     </h1>
 
-                    <div className="flex gap-4 items-center justify-evenly flex-col sm:flex-row [&>*]:grow [&>*]:basis-0">
+                    <div className="flex gap-4 items-stretch justify-evenly flex-col sm:flex-row [&>*]:grow [&>*]:basis-0">
 
-                        <SkillSelectButton power={ selectedSkill?.power } skill={selectedSkill?.name}></SkillSelectButton>
+                        <SkillSelectButton skill={ selectedSkill }>
 
-                        <SkillArmorButton energy={ 400 } interval={ 1.24 }></SkillArmorButton>
+                        </SkillSelectButton>
+
+                        <ArmorSelectButton armor={ selectedArmor } >
+                            
+                        </ArmorSelectButton>
 
                     </div>
+
+                    <CraftParameters 
+                        effort={fullEffort}
+                        craftType={craftingType}
+                        onCraftTypeChange={(type) => { setCraftingType(type) }}
+                        onEffortChange={(effort) => { setFullEffort(effort) }}
+                    >
+                    </CraftParameters>
 
                 </main>
                 <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">

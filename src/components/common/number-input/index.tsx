@@ -29,14 +29,20 @@ export default function NumberInput(
                 </label>
             }
             <NumberField.Group className={ styles.Group }>
-                <NumberField.Decrement className={ clsx(styles.Decrement, readOnly && "invisible") }>
-                    <MinusIcon />
-                </NumberField.Decrement>
+                {
+                    props.step !== 0 &&
+                        <NumberField.Decrement className={ clsx(styles.Decrement, readOnly && "invisible") }>
+                            <MinusIcon />
+                        </NumberField.Decrement>
+                }
                 <NumberField.Input
                     className={ styles.Input } />
-                <NumberField.Increment className={ clsx(styles.Increment, readOnly && "invisible") }>
-                    <PlusIcon />
-                </NumberField.Increment>
+                {
+                    props.step !== 0 &&
+                    <NumberField.Increment className={ clsx(styles.Increment, readOnly && "invisible") }>
+                        <PlusIcon />
+                    </NumberField.Increment>
+                }
             </NumberField.Group>
         </NumberField.Root>
     );
