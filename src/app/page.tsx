@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useState } from "react";
 import CraftParameters from "@/components/calculator/craft-parameters";
 import { craftParameterService } from "@/services/craft-parameter-service";
+import ProgressBar from "@/components/progress-bar";
 
 export default function Home() {
 
@@ -46,10 +47,18 @@ export default function Home() {
                     <CraftParameters 
                         effort={fullEffort}
                         craftType={craftingType}
-                        onCraftTypeChange={(type) => { setCraftingType(type) }}
-                        onEffortChange={(effort) => { setFullEffort(effort) }}
+                        onCraftTypeChange={(type) => { 
+                            setCraftingType(type);
+                            craftParameterService.setCraftingType(type);
+                        }}
+                        onEffortChange={(effort) => { 
+                            setFullEffort(effort);
+                            craftParameterService.setEffort(effort);
+                        }}
                     >
                     </CraftParameters>
+
+                    <ProgressBar current={100} max={165}></ProgressBar>
 
                 </main>
                 <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">

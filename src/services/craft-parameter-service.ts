@@ -6,18 +6,28 @@ export class CraftParameterService {
     readonly effortKey = "effort";
     readonly craftingTypeKey = "crafting-type";
 
+    constructor(
+        private storage: Storage | null
+    ) {
+
+    }
+
     getEffort(): number {
-        const effortStr = localStorage.getItem(this.effortKey);
+        if (this.storage == null) { return 0; }
+
+        const effortStr = this.storage.getItem(this.effortKey);
         const effort = tryParseInt(effortStr, 0);
         return effort;
     }    
 
     setEffort(effort: number) {
-        localStorage.setItem(this.effortKey, `${effort}`);
+        this.storage?.setItem(this.effortKey, `${effort}`);
     }
 
     getCraftingType(): CraftingType {
-        const craftingTypeName = localStorage.getItem(this.craftingTypeKey);
+        if (this.storage == null) { return craftingTypes[0]; }
+
+        const craftingTypeName = this.storage.getItem(this.craftingTypeKey);
         const craftingType = craftingTypeMap.get(craftingTypeName ?? "");
         return craftingType ?? craftingTypes[0];
     }    
@@ -26,8 +36,8 @@ export class CraftParameterService {
         if (typeof craftingType !== 'string') {
             craftingType = craftingType.name;
         }
-        localStorage.setItem(this.craftingTypeKey, craftingType);
+        this.storage?.setItem(this.craftingTypeKey, craftingType);
     }
 }
 
-export const craftParameterService = new CraftParameterService();
+export const craftParameterService = new CraftParameterService(typeof localStorage !== "undefined" ? localStorage : null);
