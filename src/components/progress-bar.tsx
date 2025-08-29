@@ -6,7 +6,7 @@ import styles from './progress-bar.module.scss';
 export type ProgressBarProps = { 
     current: number;
     max: number;
-    barColor: string;
+    barColor?: string;
 };
 
 export default function ProgressBar(

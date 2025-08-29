@@ -58,7 +58,18 @@ export default function Home() {
                     >
                     </CraftParameters>
 
-                    <ProgressBar current={100} max={165}></ProgressBar>
+
+                    <ProgressBar key="effort" 
+                        current={ 100 } 
+                        max={ fullEffort } 
+                        barColor="var(--effort)">
+                        
+                    </ProgressBar>
+
+                    <ProgressBar key="stamina" 
+                        current={ 100 } 
+                        max={ selectedArmor?.energy ?? 100 }>
+                    </ProgressBar>
 
                 </main>
                 <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
@@ -68,7 +79,6 @@ export default function Home() {
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-
                         Learn
                     </a>
                     <a

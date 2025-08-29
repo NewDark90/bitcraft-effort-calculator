@@ -37,6 +37,7 @@ $insetSize: 3px;
 .progress-bar {
     width: 100%;
     height: $height;
+    transition: clip-path 0.33s ease-in-out;
 }
 
 .progress-bar-label {
