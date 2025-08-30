@@ -12,7 +12,7 @@ export interface ArmorEntity {
     id: number;
     name: string;
     selected: 0 | 1;
-    energy: number;
+    stamina: number;
     interval: number;
     regenPerSecond: number;
 }

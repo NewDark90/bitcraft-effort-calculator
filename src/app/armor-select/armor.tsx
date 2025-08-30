@@ -53,17 +53,17 @@ export default function Armor(
 
             <NumberInput 
                 className="my-2"
-                value={armor.energy}
+                value={armor.stamina}
                 label={
                     <>
                         <ElectricBoltIcon className="mx-1" htmlColor="var(--energy, yellow)" />
-                        <span className="mx-1">Energy</span>
+                        <span className="mx-1">Stamina</span>
                     </>
                 }
                 step={1}
                 min={0}
-                onValueChange={(energy) => {
-                    onArmorChange?.({...armor, energy: energy ?? armor.energy});
+                onValueChange={(stamina) => {
+                    onArmorChange?.({...armor, stamina: stamina ?? armor.stamina});
                 }}
             >
             </NumberInput>
@@ -100,7 +100,7 @@ export default function Armor(
                 label={
                     <>
                         <AutorenewIcon className="mx-1" htmlColor="var(--energy, yellow)" />
-                        <span className="mx-1">Energy Regen</span>
+                        <span className="mx-1">Stamina Regen</span>
                     </>
                 }
                 step={1}

@@ -13,15 +13,12 @@ import { useState } from "react";
 import CraftParameters from "@/components/calculator/craft-parameters";
 import { craftParameterService } from "@/services/craft-parameter-service";
 import ProgressBar from "@/components/progress-bar";
+import WorkPlayer from "@/components/calculator/work-player";
 
 export default function Home() {
 
     const selectedSkill = useLiveQuery(async () => await skillService.getSelectedSkill());
     const selectedArmor = useLiveQuery(async () => await armorService.getSelectedArmor());
-
-    const [fullEffort, setFullEffort] = useState(craftParameterService.getEffort());
-    const [craftingType, setCraftingType] = useState(craftParameterService.getCraftingType());
-
 
     return (
         <NoSSR>
@@ -44,32 +41,13 @@ export default function Home() {
 
                     </div>
 
-                    <CraftParameters 
-                        effort={fullEffort}
-                        craftType={craftingType}
-                        onCraftTypeChange={(type) => { 
-                            setCraftingType(type);
-                            craftParameterService.setCraftingType(type);
-                        }}
-                        onEffortChange={(effort) => { 
-                            setFullEffort(effort);
-                            craftParameterService.setEffort(effort);
-                        }}
-                    >
-                    </CraftParameters>
+                    {
+                        (selectedArmor != null && selectedSkill != null) 
+                        &&
+                        <WorkPlayer armor={selectedArmor} skill={selectedSkill}>
 
-
-                    <ProgressBar key="effort" 
-                        current={ 100 } 
-                        max={ fullEffort } 
-                        barColor="var(--effort)">
-                        
-                    </ProgressBar>
-
-                    <ProgressBar key="stamina" 
-                        current={ 100 } 
-                        max={ selectedArmor?.energy ?? 100 }>
-                    </ProgressBar>
+                        </WorkPlayer>
+                    }
 
                 </main>
                 <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">

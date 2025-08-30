@@ -29,7 +29,7 @@ const armorColumns = (
         'id',
         'name',
         'selected',
-        'energy',
+        'stamina',
         'interval',
         'regenPerSecond'
     ] satisfies Array<keyof ArmorEntity>

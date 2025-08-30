@@ -39,13 +39,13 @@ export const initializeArmor = async (db: BitcraftCalculatorDatabase) => {
         {
             name: "Cloth",
             selected: 1,
-            energy: 100,
+            stamina: 100,
             interval: 1.6,
             regenPerSecond: 5
         }, {
             name: "Leather",
             selected: 0,
-            energy: 100,
+            stamina: 100,
             interval: 1.6,
             regenPerSecond: 5
         }

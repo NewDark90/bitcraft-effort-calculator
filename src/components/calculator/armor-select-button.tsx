@@ -35,7 +35,7 @@ export default function ArmorSelectButton(
             <div className="grow flex justify-center items-center">
                 <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
                 <span className="mx-2">
-                    {armor?.energy ?? 0}
+                    {armor?.stamina ?? 0}
                 </span>
             </div>
 
