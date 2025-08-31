@@ -1,27 +1,26 @@
-import { createTheme } from "@mui/material";
+import { createTheme, useMediaQuery } from "@mui/material";
 
-export const muiTheme = createTheme({
-    cssVariables: true,
-    palette: {
-        text: {
-            primary: 'var(--foreground)',
-            secondary: 'var(--color-gray-600)',
-            disabled: 'var(--color-gray-300)',
-        },
+export const buildMuiTheme = () => {
+    const theme = useMediaQuery('(prefers-color-scheme: dark)') ? "dark" : "light";
 
-    },
-    components: {
-        MuiTextField: {
-            styleOverrides: {
-                root: {
-                    '& .MuiInput-underline:before': {
-                        borderBottomColor: 'var(--color-gray-400)',
-                    },
-                    '& .MuiInput-underline:after': {
-                        borderBottomColor: 'primary.main',
-                    },
-                },
+    return createTheme({
+        cssVariables: true,
+        palette: {
+            mode: theme,
+            text: {
+                primary: 'var(--foreground)',
+                secondary: 'var(--color-gray-600)',
+                disabled: 'var(--color-gray-300)',
+                
             },
+            background: {
+                default: 'var(--background)',
+                paper: 'var(--background)',
+            },
+            
         },
-    }
-});
+        components: {
+        }
+    });
+};
+

@@ -5,6 +5,7 @@ import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@m
 import { useState } from "react";
 import { CraftingType, craftingTypeMap, craftingTypes } from "@/config/crafting-types";
 import React from "react";
+import SquareIcon from '@mui/icons-material/Square';
 
 export type SkillIconProps = { 
     effort: number;
@@ -66,7 +67,9 @@ export default function CraftParameters(
                                 value={type.name}
                                 key={type.name}
                             >
-                                {type.name}
+                                { type.name }
+                                &nbsp;
+                                { type.color && <SquareIcon htmlColor={type.color}></SquareIcon> }
                             </MenuItem>
                         ))
                     }
