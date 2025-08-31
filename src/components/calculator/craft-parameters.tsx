@@ -36,7 +36,7 @@ export default function CraftParameters(
     }
 
     return (
-        <div>
+        <div  className="w-full">
             <h2 className="w-full">
                 Craft
             </h2>

@@ -2,9 +2,13 @@ import CraftParameters from "@/components/calculator/craft-parameters";
 import ProgressBar from "@/components/progress-bar";
 import { SkillEntity, ArmorEntity } from "@/database/entities";
 import { craftParameterService } from "@/services/craft-parameter-service";
+import { wakeLockService, WakeLockService } from "@/services/wake-lock-service";
 import { Button } from "@mui/material";
 import { useState } from "react";
 import { useInterval } from "usehooks-ts";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
@@ -25,26 +29,49 @@ export default function WorkPlayer(
     // Crafting
     useInterval(
         () => {
+            const newStamina = currentStamina - craftingType.staminaCost;
+            if (newStamina < 0) {
+                // Stop, not done
+                togglePlaying(false);
+            }
 
+            setCurrentStamina(newStamina);  
+            const newEffort = Math.min(currentEffort + skill.power, fullEffort);
+            setCurrentEffort(newEffort);
+
+            if (newEffort == fullEffort) {
+                // Stop, done.
+                restart();
+            }
         },
-        isPlaying ? armor.interval : null
+        isPlaying ? (armor.interval * 1000) : null
     )
 
     // Stamina Regen
     useInterval(
         () => {
-
+            const newStamina = Math.min(currentStamina + 0.25 + armor.regenPerSecond, armor.stamina);
+            setCurrentStamina(newStamina);  
         },
         !isPlaying ? 1000 : null
     )
 
-    const togglePlaying = () => {
-        setIsPlaying(!isPlaying);
+    const togglePlaying = (playing: boolean) => {
+        (playing 
+            ? wakeLockService.lock()
+            : wakeLockService.release());
+
+        setIsPlaying(playing);
+    }
+
+    const restart = () => {
+        togglePlaying(false);
+        setCurrentEffort(0);
+        setCurrentStamina(armor.stamina);
     }
 
     return (
-        <div className="">
-            
+        <div className="w-full">
             
             <CraftParameters 
                 effort={fullEffort}
@@ -75,11 +102,25 @@ export default function WorkPlayer(
             </ProgressBar>
 
 
-            <Button 
-                onClick={togglePlaying}
-            >
-
-            </Button>
+            <div>
+                <Button 
+                    variant="text"
+                    onClick={restart}
+                >
+                    <RestartAltIcon></RestartAltIcon>
+                    
+                </Button>
+                <Button 
+                    variant="text"
+                    onClick={() => togglePlaying(!isPlaying)}
+                >
+                    {
+                        isPlaying 
+                            ? <PauseIcon></PauseIcon>
+                            : <PlayArrowIcon></PlayArrowIcon>
+                    }
+                </Button>
+            </div>
         </div>
     );
 }

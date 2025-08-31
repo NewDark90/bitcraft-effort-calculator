@@ -2,6 +2,7 @@
 
 import clsx from 'clsx';
 import styles from './progress-bar.module.scss';
+import { minmax } from '@/util/minmax';
 
 export type ProgressBarProps = { 
     current: number;
@@ -13,7 +14,8 @@ export default function ProgressBar(
     {  current, max, barColor = 'var(--energy)' }: ProgressBarProps
 ) {
 
-    const progressPercentage = ((current / max) * 100).toFixed(2) + "%";
+    const progressNumber = minmax((current / max) * 100, 0, 100)
+    const progressPercentage = progressNumber.toFixed(2) + "%";
 
     return (
         <div className={ clsx(styles['progress-bar-border']) }>
