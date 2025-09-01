@@ -7,6 +7,7 @@ $insetSize: 3px;
     text-align: center;
     height: $height;
     background-color: var(--foreground);
+    user-select: none; 
 
     clip-path: polygon(
         $borderRadiusSize 0,

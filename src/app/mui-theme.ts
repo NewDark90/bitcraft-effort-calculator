@@ -1,23 +1,35 @@
 import { createTheme, useMediaQuery } from "@mui/material";
 
+const cssVar = (varName: string): string => {
+    // This only works in browser environment
+    if (typeof window === 'undefined') 
+        return '#000000';
+    
+    const cssValue = getComputedStyle(document.documentElement)
+        .getPropertyValue(varName)
+        .trim();
+    return cssValue;
+};
+
 export const buildMuiTheme = () => {
     const theme = useMediaQuery('(prefers-color-scheme: dark)') ? "dark" : "light";
 
     return createTheme({
         cssVariables: true,
+
         palette: {
             mode: theme,
+            /*
             text: {
-                primary: 'var(--foreground)',
-                secondary: 'var(--color-gray-600)',
-                disabled: 'var(--color-gray-300)',
-                
+                primary: cssVar('--foreground'),
+                secondary: cssVar('--color-gray-600'),
+                disabled: cssVar('--color-gray-300'),
             },
             background: {
-                default: 'var(--background)',
-                paper: 'var(--background)',
+                default: cssVar('--background'),
+                paper: cssVar('--background'),
             },
-            
+            */
         },
         components: {
         }
