@@ -9,6 +9,7 @@ import { useInterval } from "usehooks-ts";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import WorkStatistics from "@/components/calculator/work-statistics";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
@@ -121,6 +122,16 @@ export default function WorkPlayer(
                     }
                 </Button>
             </div>
+
+            <WorkStatistics 
+                skill={ skill } 
+                armor={ armor } 
+                craftingType={ craftingType } 
+                fullEffort={ fullEffort } 
+                currentEffort={ currentEffort } 
+                currentStamina={ currentStamina }
+            >
+            </WorkStatistics>
         </div>
     );
 }

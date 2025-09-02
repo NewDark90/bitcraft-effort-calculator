@@ -1,10 +1,6 @@
-import Image from "next/image";
-import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import ButtonLink from "@/components/common/button-link";
-import SkillIcon from "@/components/skill-icon";
 import { ArmorEntity, SkillEntity } from "@/database/entities";
-import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { CraftingType } from "@/config/crafting-types";
+import humanizeDuration from 'humanize-duration';
 
 export type WorkStatisticsProps = { 
     
@@ -17,6 +13,9 @@ export type WorkStatisticsProps = {
     currentStamina: number;
 };
 
+const humanize = humanizeDuration.humanizer({ maxDecimalPoints: 2 })
+
+
 export default function WorkStatistics({ 
     skill, 
     armor,
@@ -26,11 +25,26 @@ export default function WorkStatistics({
     currentStamina
 }: WorkStatisticsProps) {
 
-    
+    // Ratios
+    const powerPerStamina = skill.power / craftingType.staminaCost;
+    const powerPerSecond = skill.power / armor.interval;
+
+    // Single Stamina Bar calculations
+    const staminaIterations = Math.floor(armor.stamina / craftingType.staminaCost);
+    const effortPerStaminaBar = staminaIterations * skill.power;
+    const timePerStaminaBar = staminaIterations * armor.interval;
+
+    // Full Effort Calculations
+    const timeStaminaWaiting = (Math.max(fullEffort - effortPerStaminaBar, 0) / powerPerStamina / (armor.regenPerSecond + 0.25));
+    const timeEffortCrafting = fullEffort / powerPerSecond;
 
     return (
         <div>
-
+            <div>Stamina Iterations: {staminaIterations} </div>
+            <div>Effort per Stamina Bar: {effortPerStaminaBar} </div>
+            <div>Time per Stamina Bar: {humanize(timePerStaminaBar * 1000)} </div>
+            <div>Time crafting: {humanize(timeEffortCrafting * 1000)}</div>
+            <div>Time waiting: {humanize(timeStaminaWaiting * 1000)}</div>
         </div>
     );
 }

@@ -23,7 +23,12 @@ export const initializeSkills = async (db: BitcraftCalculatorDatabase) => {
         skillMap.set(currentSkill.id, currentSkill);
     }
 
-    await db.skills.bulkPut(skillMap.values().toArray());
+    const allSkills = skillMap.values().toArray();
+    if (!allSkills.some(skill => skill.selected === 1)) {
+        allSkills[0].selected = 1;
+    }
+
+    await db.skills.bulkPut(allSkills);
 }
 
 

@@ -8,7 +8,7 @@ export class SkillService {
             id: name.toLocaleLowerCase(),
             name,
             power: 8,
-            selected: 1,
+            selected: 0,
             type: type
         };
     }

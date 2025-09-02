@@ -1,3 +1,4 @@
+
 import type { MetadataRoute } from 'next'
 
 export const dynamic = 'force-static';
@@ -12,6 +13,7 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#ffffff',
     theme_color: '#000000',
     icons: [
+        /*
       {
         src: '/icon-192x192.png',
         sizes: '192x192',
@@ -22,6 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '512x512',
         type: 'image/png',
       },
+      */
     ],
   }
 }
