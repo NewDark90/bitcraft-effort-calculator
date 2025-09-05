@@ -1,6 +1,8 @@
 import { ArmorEntity, SkillEntity } from "@/database/entities";
 import { CraftingType } from "@/config/crafting-types";
 import humanizeDuration from 'humanize-duration';
+import { Theme, useTheme } from "@mui/material";
+import clsx from "clsx";
 
 export type WorkStatisticsProps = { 
     
@@ -13,7 +15,18 @@ export type WorkStatisticsProps = {
     currentStamina: number;
 };
 
-const humanize = humanizeDuration.humanizer({ maxDecimalPoints: 2 })
+const humanize = humanizeDuration.humanizer({ round: true, largest: 2 })
+
+const row = (label: React.ReactNode, value: React.ReactNode, theme: Theme): JSX.Element => {
+    return <>
+        <div className="text-right" style={{color: theme.palette.secondary.main }}> 
+            {label} 
+        </div>
+        <div className="text-left"> 
+            {value}  
+        </div>
+    </>
+}
 
 
 export default function WorkStatistics({ 
@@ -24,6 +37,9 @@ export default function WorkStatistics({
     currentEffort,
     currentStamina
 }: WorkStatisticsProps) {
+
+    
+    const theme = useTheme();
 
     // Ratios
     const powerPerStamina = skill.power / craftingType.staminaCost;
@@ -39,12 +55,16 @@ export default function WorkStatistics({
     const timeEffortCrafting = fullEffort / powerPerSecond;
 
     return (
-        <div>
-            <div>Stamina Iterations: {staminaIterations} </div>
-            <div>Effort per Stamina Bar: {effortPerStaminaBar} </div>
-            <div>Time per Stamina Bar: {humanize(timePerStaminaBar * 1000)} </div>
-            <div>Time crafting: {humanize(timeEffortCrafting * 1000)}</div>
-            <div>Time waiting: {humanize(timeStaminaWaiting * 1000)}</div>
+        <div className="grid grid-cols-2 gap-2">
+            { row(<span>Stamina Iterations</span>, staminaIterations, theme)} 
+            { row(<span>Effort per Stamina Bar</span>, humanize(timePerStaminaBar * 1000), theme) }
+            { row(<span>Time Crafting</span>, humanize(timeEffortCrafting * 1000), theme) }
+            
+            { row(<span>Time Waiting</span>, humanize(timeStaminaWaiting * 1000), theme) }
+
+
+            
+            { /* row(<span></span>, ) */}
         </div>
     );
 }

@@ -7,18 +7,19 @@ import { minmax } from '@/util/minmax';
 export type ProgressBarProps = { 
     current: number;
     max: number;
+    className?: string;
     barColor?: string;
 };
 
 export default function ProgressBar(
-    {  current, max, barColor = 'var(--energy)' }: ProgressBarProps
+    {  current, max, className, barColor = 'var(--energy)' }: ProgressBarProps
 ) {
 
     const progressNumber = minmax((current / max) * 100, 0, 100)
     const progressPercentage = progressNumber.toFixed(2) + "%";
 
     return (
-        <div className={ clsx(styles['progress-bar-border']) }>
+        <div className={ clsx(styles['progress-bar-border'], className) }>
             <div className={ clsx(styles['progress-bar-background']) }>
                 <div className={ clsx(styles['progress-bar']) }
                     style={{

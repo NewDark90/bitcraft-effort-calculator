@@ -37,12 +37,10 @@ export default function CraftParameters(
     }
 
     return (
-        <div  className="w-full">
-            <h2 className="w-full">
-                Craft
-            </h2>
+        <div className="flex flex-wrap items-end justify-center my-2">
             
             <NumberInput 
+                className="mx-4"
                 label="Effort" 
                 value={effort}
                 step={0}
@@ -51,7 +49,10 @@ export default function CraftParameters(
             >
             </NumberInput>
 
-            <FormControl sx={{ m: 1, minWidth: 80 }}>
+            <FormControl 
+                sx={{ minWidth: 80 }}
+                className="mx-4"
+                >
                 <InputLabel id={`crafting-type-label-${id}`}>
                     {label}
                 </InputLabel>

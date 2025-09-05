@@ -10,6 +10,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import WorkStatistics from "@/components/calculator/work-statistics";
+import { minmax } from "@/util/minmax";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
@@ -30,19 +31,20 @@ export default function WorkPlayer(
     // Crafting
     useInterval(
         () => {
-            const newStamina = currentStamina - craftingType.staminaCost;
-            if (newStamina < 0) {
+            if (currentStamina <= craftingType.staminaCost) {
                 // Stop, not done
                 togglePlaying(false);
+                return;
             }
 
-            setCurrentStamina(newStamina);  
+            setCurrentStamina(stamina => stamina - craftingType.staminaCost);  
             const newEffort = Math.min(currentEffort + skill.power, fullEffort);
             setCurrentEffort(newEffort);
 
-            if (newEffort == fullEffort) {
+            if (newEffort >= fullEffort) {
                 // Stop, done.
-                restart();
+                togglePlaying(false);
+                return;
             }
         },
         isPlaying ? (armor.interval * 1000) : null
@@ -51,8 +53,7 @@ export default function WorkPlayer(
     // Stamina Regen
     useInterval(
         () => {
-            const newStamina = Math.min(currentStamina + 0.25 + armor.regenPerSecond, armor.stamina);
-            setCurrentStamina(newStamina);  
+            setCurrentStamina(stamina => minmax(stamina + 0.25 + armor.regenPerSecond, 0, armor.stamina));  
         },
         !isPlaying ? 1000 : null
     )
@@ -73,55 +74,62 @@ export default function WorkPlayer(
 
     return (
         <div className="w-full">
-            
-            <CraftParameters 
-                effort={fullEffort}
-                craftType={craftingType}
-                onCraftTypeChange={(type) => { 
-                    setCraftingType(type);
-                    craftParameterService.setCraftingType(type);
-                }}
-                onEffortChange={(effort) => { 
-                    setFullEffort(effort);
-                    setCurrentEffort(0);
-                    craftParameterService.setEffort(effort);
-                }}
-            >
-            </CraftParameters>
+            <div className="w-full my-4 flex flex-row flex-wrap justify-center">
 
+                <h2 className="w-full text-center">
+                    Craft
+                </h2>
 
-            <ProgressBar key="effort" 
-                current={ currentEffort } 
-                max={ fullEffort } 
-                barColor="var(--effort)">
+                <CraftParameters 
+                    effort={fullEffort}
+                    craftType={craftingType}
+                    onCraftTypeChange={(type) => { 
+                        setCraftingType(type);
+                        craftParameterService.setCraftingType(type);
+                    }}
+                    onEffortChange={(effort) => { 
+                        setFullEffort(effort);
+                        setCurrentEffort(0);
+                        craftParameterService.setEffort(effort);
+                    }}
+                >
+                </CraftParameters>
+
                 
-            </ProgressBar>
-
-            <ProgressBar key="stamina" 
-                current={ currentStamina } 
-                max={ armor?.stamina ?? 100 }>
-            </ProgressBar>
-
-
-            <div>
                 <Button 
                     variant="text"
                     onClick={restart}
                 >
-                    <RestartAltIcon></RestartAltIcon>
+                    <RestartAltIcon color="warning" sx={{ fontSize: 48 }}></RestartAltIcon>
                     
                 </Button>
+
                 <Button 
+                    className="w-full"
                     variant="text"
                     onClick={() => togglePlaying(!isPlaying)}
                 >
                     {
                         isPlaying 
-                            ? <PauseIcon></PauseIcon>
-                            : <PlayArrowIcon></PlayArrowIcon>
+                            ? <PauseIcon color="info"  sx={{ fontSize: 96 }}></PauseIcon>
+                            : <PlayArrowIcon color="info" sx={{ fontSize: 96 }}></PlayArrowIcon>
                     }
                 </Button>
             </div>
+
+            <ProgressBar key="stamina" 
+                className="my-4"
+                current={ currentStamina } 
+                max={ armor?.stamina ?? 100 }>
+            </ProgressBar>
+
+            <ProgressBar key="effort" 
+                className="my-4"
+                current={ currentEffort } 
+                max={ fullEffort } 
+                barColor="var(--effort)">
+                
+            </ProgressBar>
 
             <WorkStatistics 
                 skill={ skill } 
