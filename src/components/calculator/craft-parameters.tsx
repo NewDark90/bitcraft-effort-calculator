@@ -7,25 +7,42 @@ import { CraftingType, craftingTypeMap, craftingTypes } from "@/config/crafting-
 import React from "react";
 import SquareIcon from '@mui/icons-material/Square';
 
-export type SkillIconProps = { 
-    effort: number;
+export type CraftParametersProps = { 
+    fullEffort: number;
+    currentEffort: number;
     craftType: CraftingType;
 
-    onEffortChange: (effort: number) => void;
+    isWorking: boolean;
+    power?: number;
+
+    onFullEffortChange: (effort: number) => void;
+    onCurrentEffortChange: (effort: number) => void;
     onCraftTypeChange: (craftType: CraftingType) => void;
 };
 
 export default function CraftParameters(
-    { effort, craftType, onEffortChange, onCraftTypeChange }: SkillIconProps
+    { 
+        fullEffort, 
+        currentEffort, 
+        craftType, 
+        power,
+        isWorking,
+        onCurrentEffortChange, 
+        onFullEffortChange, 
+        onCraftTypeChange 
+    }: CraftParametersProps
 ) {
     const id = React.useId();
     const label = "Type";
 
-    const effortChangeHandler = (effort: number | null) => {
+    const effortChangeHandler = (
+        effort: number | null, 
+        changeHandler: (effort: number) => void
+    ) => {
         if (effort == null) {
             return;
         }
-        onEffortChange(effort);
+        changeHandler(effort);
     }
 
     const craftingTypeChangeHandler = (event: SelectChangeEvent) => {
@@ -39,15 +56,6 @@ export default function CraftParameters(
     return (
         <div className="flex flex-wrap items-end justify-center my-2">
             
-            <NumberInput 
-                className="mx-4"
-                label="Effort" 
-                value={effort}
-                step={0}
-                min={0}
-                onValueChange={effortChangeHandler}
-            >
-            </NumberInput>
 
             <FormControl 
                 sx={{ minWidth: 80 }}
@@ -76,6 +84,30 @@ export default function CraftParameters(
                     }
                 </Select>
             </FormControl>
+
+            <NumberInput 
+                className="mx-4"
+                label="Effort Total" 
+                value={fullEffort}
+                step={ 0 }
+                min={ 0 }
+                readOnly={ isWorking }
+                onValueChange={(effort) => effortChangeHandler(effort, onFullEffortChange)}
+            >
+            </NumberInput>
+
+            
+            <NumberInput 
+                className="mx-4"
+                label="Effort Progress" 
+                value={currentEffort}
+                step={ 0 }
+                min={ 0 }
+                max={ fullEffort }
+                readOnly={ isWorking }
+                onValueChange={(effort) => effortChangeHandler(effort, onCurrentEffortChange)}
+            >
+            </NumberInput>
         </div>
     );
 }

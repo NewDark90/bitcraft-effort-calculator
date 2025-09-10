@@ -1,18 +1,33 @@
 import * as React from 'react';
 import { NumberField } from '@base-ui-components/react/number-field';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { clsx } from 'clsx';
-import './index.theme.css';
-import styles from './index.module.css';
+import './index.theme.scss';
+import styles from './index.module.scss';
 
 export type NumberInputProps = {
     value?: number;
     readOnly?: boolean;
+    readOnlyField?: boolean;
+    readOnlyStep?: boolean;
     label?: string | React.ReactElement;
+    displayStepValue?: boolean;
     className?: string;
 } & NumberField.Root.Props
 
 export default function NumberInput(
-    { value, onInput, readOnly, className, label, ...props }: NumberInputProps
+    { 
+        value, 
+        readOnly, 
+        readOnlyField,
+        readOnlyStep,
+        className, 
+        label, 
+        displayStepValue, 
+        onInput, 
+        ...props 
+    }: NumberInputProps
 ) {
     const id = React.useId();
     return (
@@ -21,6 +36,7 @@ export default function NumberInput(
             id={ id } 
             value={ value } 
             className={ `${styles.Field} ${className ?? ""}` } 
+            
             readOnly={readOnly ?? false}
         >
             {
@@ -31,53 +47,22 @@ export default function NumberInput(
             <NumberField.Group className={ styles.Group }>
                 {
                     props.step !== 0 &&
-                        <NumberField.Decrement className={ clsx(styles.Decrement, readOnly && "invisible") }>
-                            <MinusIcon />
+                        <NumberField.Decrement className={ clsx(styles.Decrement, (readOnly || readOnlyStep) && "!hidden") }>
+                            <RemoveIcon fontSize='small' /> {displayStepValue && props.step?.toString()}
                         </NumberField.Decrement>
                 }
+                
                 <NumberField.Input
+                    readOnly={readOnly || readOnlyField}
                     className={ styles.Input } />
+
                 {
                     props.step !== 0 &&
-                    <NumberField.Increment className={ clsx(styles.Increment, readOnly && "invisible") }>
-                        <PlusIcon />
-                    </NumberField.Increment>
+                        <NumberField.Increment className={ clsx(styles.Increment, (readOnly || readOnlyStep) && "!hidden") }>
+                            <AddIcon fontSize='small' /> {displayStepValue && props.step?.toString()}
+                        </NumberField.Increment>
                 }
             </NumberField.Group>
         </NumberField.Root>
-    );
-}
-
-function PlusIcon(props: React.ComponentProps<'svg'>) {
-    return (
-        <svg
-            width="10"
-            height="10"
-            viewBox="0 0 10 10"
-            fill="none"
-            stroke="currentcolor"
-            strokeWidth="1.6"
-            xmlns="http://www.w3.org/2000/svg"
-            { ...props }
-        >
-            <path d="M0 5H5M10 5H5M5 5V0M5 5V10" />
-        </svg>
-    );
-}
-
-function MinusIcon(props: React.ComponentProps<'svg'>) {
-    return (
-        <svg
-            width="10"
-            height="10"
-            viewBox="0 0 10 10"
-            fill="none"
-            stroke="currentcolor"
-            strokeWidth="1.6"
-            xmlns="http://www.w3.org/2000/svg"
-            { ...props }
-        >
-            <path d="M0 5H10" />
-        </svg>
     );
 }
