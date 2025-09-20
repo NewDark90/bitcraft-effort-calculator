@@ -1,7 +1,6 @@
 import CraftParameters from "@/components/calculator/craft-parameters";
 import ProgressBar from "@/components/progress-bar";
 import { SkillEntity, ArmorEntity } from "@/database/entities";
-import { wakeLockService } from "@/services/wake-lock-service";
 import { Button } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -27,7 +26,7 @@ export default function WorkPlayer(
         currentStamina, 
         isWorking, setIsWorking,
         doWork, restart,
-    } = useWorkPlayerState(armor, skill, wakeLockService);
+    } = useWorkPlayerState(armor, skill);
 
     return (
         <div className="w-full">
