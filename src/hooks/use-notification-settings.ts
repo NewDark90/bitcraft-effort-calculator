@@ -16,6 +16,8 @@ export const useNotificationSettings = (
             _setNotificationPermission(newPermission);
         }
         _setNotificationStyle(notificationStyle);
+
+        //Set in db
     }
 
     return {

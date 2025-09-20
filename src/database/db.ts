@@ -1,16 +1,13 @@
 // db.ts
-import { professions } from '@/config/professions';
-import { skills } from '@/config/skills';
-import { ArmorEntity, SkillEntity } from '@/database/entities';
-import { initializeArmor, initializeSkills } from '@/database/init';
-import { skillService } from '@/services/skill-service';
+import { ArmorEntity, SettingEntity, SkillEntity } from '@/database/entities';
+import { initializeArmor, initializeSettings, initializeSkills } from '@/database/init';
 import Dexie, { type EntityTable } from 'dexie';
 
 export type BitcraftCalculatorDatabase = Dexie & {
     skills: EntityTable<SkillEntity, 'id'>;
     armors: EntityTable<ArmorEntity, 'id'>;
+    settings: EntityTable<SettingEntity, 'id'>;
 };
-
 
 const calculatorDatabase = new Dexie('BitcraftCalculatorDatabase') as BitcraftCalculatorDatabase;
 
@@ -36,9 +33,17 @@ const armorColumns = (
 );
 armorColumns[0] = `++${armorColumns[0]}` as any; //autoincrement definition
 
+const settingColumns = (
+    [
+        'id',
+        'value',
+    ] satisfies Array<keyof SettingEntity>
+);
+
 calculatorDatabase.version(1).stores({
     skills: skillColumns.join(", "),
-    armors: armorColumns.join(", ")
+    armors: armorColumns.join(", "),
+    settings: settingColumns.join(", "),
 });
 
 
@@ -47,6 +52,7 @@ calculatorDatabase.on("ready", async (vipDb) => {
 
     await initializeSkills(vipDb as BitcraftCalculatorDatabase);
     await initializeArmor(vipDb as BitcraftCalculatorDatabase);
+    await initializeSettings(vipDb as BitcraftCalculatorDatabase);
     
 })
 

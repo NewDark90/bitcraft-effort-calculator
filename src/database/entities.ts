@@ -16,3 +16,17 @@ export interface ArmorEntity {
     interval: number;
     regenPerSecond: number;
 }
+
+export type IDBValidKey = string | number | Date | ArrayBuffer | IDBValidKey[];
+
+export interface SettingEntity<
+    TId extends string = string, 
+    TValue = IDBValidKey
+> {
+    id: TId;
+    value: TValue;
+}
+
+export const settingKeys = {
+    notificationType: "notification-type" // Service worker won't have this context if the variable changes.
+} as const
