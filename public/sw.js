@@ -58,13 +58,13 @@ class CancellableTimeout {
 
     /** 
      * @param {ExtendableMessageEvent} event 
-     * @param {MessageEventCraftNotficiationQueueData} eventData 
+     * @param {ServiceWorkerMessageEventCraftNotificationQueueRequest} eventData 
      * */
     const craftNotificationQueue = async (event, eventData) => {
         
         event.waitUntil((async () => {
             craftNotificationCancel();
-            notificationPromise = new CancellableTimeout(eventData.finishMs, eventData);
+            notificationPromise = new CancellableTimeout(eventData.payload.finishMs, eventData);
             notificationPromise.then((eventData) => {
                 
                 // Notify
@@ -100,11 +100,11 @@ class CancellableTimeout {
 
     self.addEventListener('message', (event) => {
 
-        /** @type {MessageEventData} */
-        const eventData =  event.data;
-        if (eventData.type === "craft-notification.queue") {
+        
+        const eventData =/** @type {ServiceWorkerMessageEventRequest} */  event.data;
+        if (eventData.type === "craft-notification.request.queue") {
             craftNotificationQueue(event, eventData);
-        } else if (eventData.type === "craft-notification.cancel") {
+        } else if (eventData.type === "craft-notification.request.cancel") {
             craftNotificationCancel();
         }
         

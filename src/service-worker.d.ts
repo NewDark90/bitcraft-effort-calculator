@@ -1,12 +1,18 @@
-declare type MessageEventData = MessageEventCraftNotficiationQueueData | MessageEventCraftNotficiationCancelData;
 
-declare type MessageEventCraftNotficiationQueueData = {
-    type: 'craft-notification.queue';
-    finishMs: number;
+declare interface ServiceWorkerMessage<TType extends string = string, TPayload = any> {
+    type: TType;
+    payload: TPayload;
+    id?: string; // Optional message ID for request-response tracking
 }
 
-declare type MessageEventCraftNotficiationCancelData = {
-    type: 'craft-notification.cancel';
-}
+declare type ServiceWorkerMessageEventCraftNotificationQueueRequest = ServiceWorkerMessage<'craft-notification.request.queue', {finishMs: number}>;
 
-declare type MessageEventCraftNotficiationQueueResolver = (result: null | MessageEventCraftNotficiationQueueData) => void
+declare type ServiceWorkerMessageEventCraftNotificationCancelRequest = ServiceWorkerMessage<'craft-notification.request.cancel', void>;
+
+declare type ServiceWorkerMessageEventRequest = ServiceWorkerMessageEventCraftNotificationQueueRequest | ServiceWorkerMessageEventCraftNotificationCancelRequest;
+
+
+
+declare type ServiceWorkerMessageEventCraftNotificationCompleteResponse = ServiceWorkerMessage<'craft-notification.response.complete', void>;
+
+declare type ServiceWorkerMessageEventResponse = ServiceWorkerMessageEventCraftNotificationCompleteResponse;
