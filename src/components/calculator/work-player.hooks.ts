@@ -24,7 +24,18 @@ export type UseWorkPlayerStateReturn = {
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
     doStaminaRegen: (ratio?: number) => void; 
-} 
+    getWorkProgressStats: () => WorkProgressStats;
+};
+
+export type WorkProgressStats = { 
+    willComplete: boolean; 
+    staminaIterations: number; 
+    remainingWorkTimeMs: number; 
+    remainingEffort: number; 
+    timeToRegenerateStaminaMs: number;
+}
+
+const flatStaminaRegenRate = 0.25;
 
 export const useWorkPlayerState = (
     armor: ArmorEntity,
@@ -58,7 +69,7 @@ export const useWorkPlayerState = (
     }, []);
 
     const doStaminaRegen = (ratio: number = 1) => {
-        const newStamina =  minmax(currentStamina + ((0.25 + armor.regenPerSecond) * ratio), 0, armor.stamina);
+        const newStamina =  minmax(currentStamina + ((flatStaminaRegenRate + armor.regenPerSecond) * ratio), 0, armor.stamina);
         _setCurrentStamina(newStamina); 
         return newStamina;
     }
@@ -102,10 +113,33 @@ export const useWorkPlayerState = (
         setCurrentEffort(newEffort);
 
         const staminaTicks = Math.floor(timeDelta / 1000);
-        const staminaRegenerated = (0.25 + armor.regenPerSecond) * staminaTicks;
-        _setCurrentStamina(minmax(newStamina + staminaRegenerated, 0, armor.stamina));  
-        
+        const staminaRegenerated = (flatStaminaRegenRate + armor.regenPerSecond) * staminaTicks;
+        _setCurrentStamina(minmax(newStamina + staminaRegenerated, 0, armor.stamina));      
     }
+
+    const getWorkProgressStats = (): WorkProgressStats => {
+        const remainingStaminaIterations = Math.floor(currentStamina / craftingType.staminaCost);
+        const neededStaminaIterations = Math.ceil((fullEffort - currentEffort) / skill.power);
+
+        const willComplete = remainingStaminaIterations <= neededStaminaIterations;
+        //We either run out of stamina or complete the work, whatever comes first.
+        const staminaIterations = Math.min(remainingStaminaIterations, neededStaminaIterations);
+
+        const remainingWorkTimeMs = staminaIterations * workInterval;
+        const remainingEffort = staminaIterations * skill.power;
+
+        const staminaAfterWorkIterations = currentStamina - (staminaIterations * craftingType.staminaCost);
+        const timeToRegenerateStaminaMs = ((armor.stamina - staminaAfterWorkIterations) / (flatStaminaRegenRate + armor.regenPerSecond)) * 1000;
+
+        return {
+            willComplete,
+            staminaIterations,
+            remainingWorkTimeMs,
+            remainingEffort,
+            timeToRegenerateStaminaMs
+        };
+    }
+
     const result = {
         fullEffort,
         currentEffort,
@@ -121,7 +155,8 @@ export const useWorkPlayerState = (
         setFullEffort,
         doWork, 
         doWorkBatch,
-        doStaminaRegen
+        doStaminaRegen,
+        getWorkProgressStats
     };
 
     useWorkPlayerInteractivity(result);
@@ -131,13 +166,7 @@ export const useWorkPlayerState = (
 
 type UseWorkPlayerInteractivityParameters = UseWorkPlayerStateReturn;
 
-const onServiceWorkerMessage = (message: ServiceWorkerMessage) => {
-    const messageResponse = message as unknown as ServiceWorkerMessageEventResponse;
-    if (messageResponse.type === 'craft-notification.response.complete') {
-        
-    }
 
-}
 
 const useWorkPlayerInteractivity = (
     {
@@ -145,7 +174,8 @@ const useWorkPlayerInteractivity = (
         doWork,
         workInterval,
         doStaminaRegen,
-        doWorkBatch
+        doWorkBatch,
+        getWorkProgressStats
     }: UseWorkPlayerInteractivityParameters
 ) => {
 
@@ -153,6 +183,15 @@ const useWorkPlayerInteractivity = (
     const [isFocused, setIsFocused] = useState(true);
     //const [blurredStamp, _setBlurredStamp] = useLocalStorage<null|number>('work-player.blurred-stamp', null);
     const { wakeLock, wakeRelease } = useWakeLock();
+
+    const onServiceWorkerMessage = (message: ServiceWorkerMessage) => {
+        const messageResponse = message as unknown as ServiceWorkerMessageEventResponse;
+        if (messageResponse.type === 'craft-notification.response.complete') {
+            // Play sound if complete or out of stamina.
+        }
+
+    }
+
     const serviceWorker = useServiceWorker({ 
         serviceWorkerUrl: "/sw.js", 
         onMessage: onServiceWorkerMessage, 
@@ -173,10 +212,21 @@ const useWorkPlayerInteractivity = (
                     id: settingKeys.calculatorBlurStamp,
                     value: Date.now()
                 });
-            }
 
-            if (serviceWorker.isSupported && serviceWorker.isRegistered) {
-                serviceWorker.postMessage("")
+                const stats = getWorkProgressStats();
+                if (serviceWorker.isRegistered) {
+                    serviceWorker.postMessage({
+                        type: "craft-notification.request.queue",
+                        payload: {
+                            finishMs: stats.remainingWorkTimeMs,
+                            willComplete: stats.willComplete
+                        }
+                    } satisfies ServiceWorkerMessageEventRequest);
+                } else {
+                    // Handle fallback if service worker doesn't exist. Other options have drawbacks.
+                    // Could default to having a regular timer (might get out of sync)
+                    // Could ignore this case given ~94% support.
+                }
             }
 
             setIsFocused(false);
@@ -189,6 +239,8 @@ const useWorkPlayerInteractivity = (
         async (event) => {
             
             if (isWorking) {
+                // In this case, we've lost focus, and regained it before the service worker recognizes it being done. 
+                // Fast-forward the work steps to current time. 
                 const blurredStamp = await calculatorDatabase.settings.get(settingKeys.calculatorBlurStamp);
                 if (blurredStamp?.value) {
                     const timeElapsed = Date.now() - (blurredStamp?.value as number);
@@ -198,6 +250,13 @@ const useWorkPlayerInteractivity = (
                         value: null
                     });
                 }
+            }
+            
+            if (serviceWorker.isRegistered) {
+                serviceWorker.postMessage({
+                    type: "craft-notification.request.cancel",
+                    payload: null
+                } satisfies ServiceWorkerMessageEventRequest);
             }
             setIsFocused(true);
         }, 

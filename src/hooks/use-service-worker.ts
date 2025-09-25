@@ -25,7 +25,6 @@ export const useServiceWorker = (options: UseServiceWorkerOptions = {}) => {
         if (!isSupported) return;
 
         const handleMessage = (event: MessageEvent) => {
-            // Basic safety check to ensure message is from service worker
             if (!event.data || typeof event.data !== 'object') return;
 
             const message = event.data as ServiceWorkerMessage;
