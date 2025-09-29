@@ -21,58 +21,53 @@ export default function SkillSelect() {
 
     return (
         <NoSSR>
-            <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-                <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-w-6xl">
-                    <nav>
-                        <Link
-                            className="m-2 flex justify-baseline font-bold"
-                            href={`../`}
-                        >
-                            <ChevronLeftIcon className="mx-1 "></ChevronLeftIcon>
-                            Calculator
-                        </Link>
-                    </nav>
-                    <section className="w-full">
-                        <h2 className={titleCss}>
-                            Professions
-                        </h2>
-                        <div className="grid grid-cols-4 gap-4">
-                        {
-                            skills
-                                ?.filter(skill => skill.type == 'profession')
-                                .map(profession => (
-                                    <Skill 
-                                        key={profession.id} 
-                                        skill={profession}
-                                        className="">
+            <nav>
+                <Link
+                    className="m-2 flex justify-baseline font-bold"
+                    href={`../`}
+                >
+                    <ChevronLeftIcon className="mx-1 "></ChevronLeftIcon>
+                    Calculator
+                </Link>
+            </nav>
+            <section className="w-full">
+                <h2 className={titleCss}>
+                    Professions
+                </h2>
+                <div className="grid grid-cols-4 gap-4">
+                {
+                    skills
+                        ?.filter(skill => skill.type == 'profession')
+                        .map(profession => (
+                            <Skill 
+                                key={profession.id} 
+                                skill={profession}
+                                className="">
 
-                                    </Skill>
-                                ))
-                        }
-                        </div>
-                    </section>
+                            </Skill>
+                        ))
+                }
+                </div>
+            </section>
 
-                    <section className="w-full">
-                        <h2 className={titleCss}>
-                            Skills
-                        </h2>
-                        <div className="grid grid-cols-4 gap-4">
-                        {
-                            skills
-                                ?.filter(skill => skill.type == 'skill')
-                                .map(skill => (
-                                    <Skill 
-                                        key={skill.id} 
-                                        skill={skill} 
-                                        className="">    
-                                    </Skill>
-                                ))
-                        }
-                        </div>
-                    </section>
-                    
-                </main>
-            </div>
+            <section className="w-full">
+                <h2 className={titleCss}>
+                    Skills
+                </h2>
+                <div className="grid grid-cols-4 gap-4">
+                {
+                    skills
+                        ?.filter(skill => skill.type == 'skill')
+                        .map(skill => (
+                            <Skill 
+                                key={skill.id} 
+                                skill={skill} 
+                                className="">    
+                            </Skill>
+                        ))
+                }
+                </div>
+            </section>
         </NoSSR>
     );
 }

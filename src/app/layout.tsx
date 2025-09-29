@@ -6,6 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { buildMuiTheme } from "@/app/mui-theme";
+import SettingsDialog from "@/components/settings/settings-dialog";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -38,7 +39,22 @@ export default function RootLayout({
             >
                 <AppRouterCacheProvider options={ { enableCssLayer: true } }>
                     <ThemeProvider theme={ theme }>
-                        { children }
+                        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] [&>*]:max-w-6xl [&>*]:w-full">
+                            <header className="relative">
+                                <h1 className="text-center text-3xl">
+                                    Bitcraft Online Effort Calculator
+                                </h1>
+                                <SettingsDialog buttonClassName={"absolute top-[0] right-[0]"}>
+            
+                                </SettingsDialog>
+                            </header>
+                            <main>
+                                { children }
+                            </main>
+                            <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+                                Footer
+                            </footer>
+                        </div>
                     </ThemeProvider>
                 </AppRouterCacheProvider>
             </body>

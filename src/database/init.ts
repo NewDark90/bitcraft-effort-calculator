@@ -1,8 +1,7 @@
 import { professions } from "@/config/professions";
 import { skills } from "@/config/skills";
 import { BitcraftCalculatorDatabase } from "@/database/db";
-import { ArmorEntity, SettingEntity, settingKeys, SkillEntity } from "@/database/entities";
-import { NotificationStyle } from "@/hooks/use-notification-settings";
+import { ArmorEntity, NotificationStyle, SettingEntity, settingKeys, SkillEntity } from "@/database/entities";
 import { skillService } from "@/services/skill-service";
 
 export const initializeSkills = async (db: BitcraftCalculatorDatabase) => {
@@ -72,7 +71,7 @@ export const initializeSettings = async (db: BitcraftCalculatorDatabase) => {
            id: settingKeys.notificationType,
            value: "when-away"
         } satisfies SettingEntity<typeof settingKeys.notificationType, NotificationStyle>;
-        
+
         await db.settings.add(setting, settingKeys.notificationType)
     }
 

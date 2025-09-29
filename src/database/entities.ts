@@ -27,8 +27,13 @@ export interface SettingEntity<
     value: TValue;
 }
 
+export type NotificationStyle = "always" | "when-away" | "never";
+
 // Service worker won't have this context if the variable changes.
 export const settingKeys = {
     notificationType: "notification-type",
-    calculatorBlurStamp: "blurred-stamp"
-} as const
+    calculatorBlurStamp: "blurred-stamp",
+    playAlarmAudio: "play-alarm-audio" 
+} as const;
+
+export type SettingKeyType = typeof settingKeys[keyof typeof settingKeys];

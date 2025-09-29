@@ -1,9 +1,8 @@
 import { calculatorDatabase } from "@/database/db";
-import { settingKeys } from "@/database/entities";
+import { NotificationStyle, settingKeys } from "@/database/entities";
+import { useSettings } from "@/hooks/use-settings";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
-
-export type NotificationStyle = "always" | "when-away" | "never";
 
 export type UseNotificationSettingsReturn = { 
     notificationStyle: NotificationStyle; 
@@ -15,6 +14,7 @@ export const useNotificationSettings = (
     
 ): UseNotificationSettingsReturn => {
 
+    // Not supported by the browser
     if (!("Notification" in window)) {
         const fauxSetNotificationStyle = useCallback((style: string) => Promise.resolve(), []);
         return {
@@ -24,29 +24,20 @@ export const useNotificationSettings = (
         }
     }
 
-    const notificationStyle = useLiveQuery(
-        async () => {
-            const style = await calculatorDatabase.settings.get(settingKeys.notificationType)
-            return style?.value as NotificationStyle | null;
-        }, 
-        []
-    ) ?? "when-away";
+    const { settings: { notificationStyle } } = useSettings();
 
     const [notificationPermission, _setNotificationPermission] = useState(Notification.permission);
 
-    const setNotificationStyle = async (notificationStyle: NotificationStyle) => {
-        if (notificationStyle === "always" || notificationStyle === "when-away") {
+    const setNotificationStyle = async (style: NotificationStyle) => {
+        if (style === "always" || style === "when-away") {
             const newPermission = await Notification.requestPermission();
             _setNotificationPermission(newPermission);
         }
-        await calculatorDatabase.settings.put({
-            id: settingKeys.notificationType,
-            value: notificationStyle
-        });
+        await notificationStyle.save(style);
     }
 
     return {
-        notificationStyle,
+        notificationStyle: notificationStyle.value,
         notificationPermission,
         setNotificationStyle
     };

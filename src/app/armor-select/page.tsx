@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { useLiveQuery } from "dexie-react-hooks";
 import { armorService } from "@/services/armor-service";
 import Armor from "@/app/armor-select/armor";
 import { useEffect, useState } from "react";
