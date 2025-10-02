@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link, { LinkProps } from "next/link";
 import { ReactNode } from "react";
 
@@ -8,17 +9,15 @@ export default function ButtonLink(
 ) {
 
     const textClasses = "text-center font-medium text-sm sm:text-base";
-    const sizeClasses = "px-4 py-1 sm:px-5 sm:py-2"; //w-full sm:w-auto md:w-[188px]
+    const sizeClasses = "px-4 py-1 sm:px-6 sm:py-3"; //w-full sm:w-auto md:w-[188px]
     const buttonClasses = "rounded-xl border border-solid border-black/[.08] dark:border-white/[.145] transition-colors hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent";
 
-    const allClasses = [
+    const allClasses = clsx(
         textClasses,
         sizeClasses,
         buttonClasses,
         props.className
-    ].join(" ");
-
-    console.log(allClasses);
+    );
 
     return (
         <Link

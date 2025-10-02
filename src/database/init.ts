@@ -45,14 +45,16 @@ export const initializeArmor = async (db: BitcraftCalculatorDatabase) => {
             name: "Cloth",
             selected: 1,
             stamina: 100,
-            interval: 1.6,
-            regenPerSecond: 5
+            buildBonus: 0,
+            craftBonus: 0,
+            gatherBonus: 0
         }, {
             name: "Leather",
             selected: 0,
             stamina: 100,
-            interval: 1.6,
-            regenPerSecond: 5
+            buildBonus: 0,
+            craftBonus: 0,
+            gatherBonus: 0
         }
     ];
 

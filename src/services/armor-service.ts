@@ -8,10 +8,11 @@ export class ArmorService {
     getDefaultArmorDetail(): Omit<ArmorEntity, "id"> {
         return {
             name: "",
+            selected: 0,
             stamina: 100,
-            interval: 1.6,
-            regenPerSecond: 0,
-            selected: 0
+            buildBonus: 0,
+            craftBonus: 0,
+            gatherBonus: 0,
         };
     }
 

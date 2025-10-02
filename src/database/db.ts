@@ -1,11 +1,12 @@
 // db.ts
-import { ArmorEntity, SettingEntity, SkillEntity } from '@/database/entities';
+import { ArmorEntity, FoodEntity, SettingEntity, SkillEntity } from '@/database/entities';
 import { initializeArmor, initializeSettings, initializeSkills } from '@/database/init';
 import Dexie, { type EntityTable } from 'dexie';
 
 export type BitcraftCalculatorDatabase = Dexie & {
     skills: EntityTable<SkillEntity, 'id'>;
     armors: EntityTable<ArmorEntity, 'id'>;
+    foods: EntityTable<FoodEntity, 'id'>;
     settings: EntityTable<SettingEntity, 'id'>;
 };
 
@@ -27,11 +28,25 @@ const armorColumns = (
         'name',
         'selected',
         'stamina',
-        'interval',
-        'regenPerSecond'
+        'gatherBonus',
+        'craftBonus',
+        'buildBonus'
     ] satisfies Array<keyof ArmorEntity>
 );
 armorColumns[0] = `++${armorColumns[0]}` as any; //autoincrement definition
+
+const foodColumns = (
+    [
+        'id',  //type / tier slug
+        'tier',
+        'type',
+        'selected',
+        'staminaRegen',
+        'gatherBonus',
+        'craftBonus',
+        'buildBonus'
+    ] satisfies Array<keyof FoodEntity>
+);
 
 const settingColumns = (
     [
@@ -43,6 +58,7 @@ const settingColumns = (
 calculatorDatabase.version(1).stores({
     skills: skillColumns.join(", "),
     armors: armorColumns.join(", "),
+    foods: foodColumns.join(", "),
     settings: settingColumns.join(", "),
 });
 
@@ -52,6 +68,7 @@ calculatorDatabase.on("ready", async (vipDb) => {
 
     await initializeSkills(vipDb as BitcraftCalculatorDatabase);
     await initializeArmor(vipDb as BitcraftCalculatorDatabase);
+    await initializeFood(vipDb as BitcraftCalculatorDatabase);
     await initializeSettings(vipDb as BitcraftCalculatorDatabase);
     
 })

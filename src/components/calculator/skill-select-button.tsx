@@ -10,20 +10,18 @@ export default function SkillSelectButton(
 ) {
 
     const iconSize = 32;
-    
-    const buttonClasses = "flex flex-wrap items-center justify-evenly";
 
     return (
         <ButtonLink
             href="/skill-select"
             rel="noopener noreferrer"
-            className={buttonClasses}
+            className="flex flex-wrap items-center justify-evenly"
         >
-            <span className="w-full">
-                Tool Power
+            <span className="w-full mb-2 text-lg font-bold">
+                Skill
             </span>
             
-            <div className="grow flex justify-center items-center">
+            <span className="flex justify-center items-center">
                 <Image
                     aria-hidden
                     className="invert-0 dark:invert -scale-x-100"
@@ -33,15 +31,15 @@ export default function SkillSelectButton(
                     height={ 24 }
                 />
                 <span className="mx-2">{skill?.power ?? 0}</span>
-            </div>
+            </span>
 
-            <div className="grow flex justify-center items-center">
+            <span className="flex justify-center items-center">
                 <SkillIcon 
                     name={ skill?.name } 
                     size={ iconSize } 
                 ></SkillIcon>
                 <span className="mx-2">{skill?.name ?? "[Select Skill]"}</span>
-            </div>
+            </span>
         </ButtonLink>
     );
 }

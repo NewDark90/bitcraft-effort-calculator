@@ -1,3 +1,7 @@
+import { TierNumber } from "@/config/tier";
+
+
+
 export type SkillEntityType = 'skill' | 'profession';
 
 export interface SkillEntity {
@@ -13,8 +17,22 @@ export interface ArmorEntity {
     name: string;
     selected: 0 | 1;
     stamina: number;
-    interval: number;
-    regenPerSecond: number;
+    gatherBonus: number;
+    craftBonus: number;
+    buildBonus: number;
+}
+
+export type FoodType = "Basic Food" | "Meal" | "Fish Meal" | "Deluxe Fish Meal"
+
+export interface FoodEntity {
+    id: string;
+    type: FoodType;
+    tier: TierNumber;
+    selected: 0 | 1;
+    staminaRegen: number;
+    gatherBonus: number;
+    craftBonus: number;
+    buildBonus: number;
 }
 
 export type IDBValidProp = string | number | Date | ArrayBuffer | null | IDBValidProp[];

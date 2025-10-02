@@ -37,6 +37,7 @@ export default function WorkPlayer(
                 </h2>
 
                 <CraftParameters 
+                    className="w-full"
                     fullEffort={fullEffort}
                     currentEffort={currentEffort}
                     craftType={craftingType}
@@ -50,26 +51,20 @@ export default function WorkPlayer(
                 </CraftParameters>
 
                 
-                <Button 
-                    variant="text"
-                    onClick={restart}
-                >
-                    <RestartAltIcon color="warning" sx={{ fontSize: 48 }}></RestartAltIcon>
-                    
-                </Button>
 
                 <div 
-                    className="w-full flex flex-row justify-center my-2"
+                    className="w-full flex flex-row justify-between sm:justify-center align-center my-2 grow"
                     >
+                    <div className="hidden sm:block grow w-[64px]"></div>
                     <Button 
                         variant="text"
-                        className="w-1/5"
+                        className="mx-2 p-2 md:px-8 md:py-3"
                         onClick={() => doWork(-1)}
                     >
                         <UndoIcon color="info" fontSize="large"></UndoIcon>
                     </Button>
                     <Button 
-                        className="w-2/5"
+                        className="mx-2 p-2 md:px-8 md:py-3"
                         variant="text"
                         onClick={() => setIsWorking(!isWorking)}
                     >
@@ -81,12 +76,25 @@ export default function WorkPlayer(
                     </Button>
                     <Button 
                         variant="text"
-                        className="w-1/5"
+                        className="mx-2 p-2 md:px-8 md:py-3"
                         onClick={() => doWork(1)}
                     >
                         <RedoIcon color="info" fontSize="large"></RedoIcon>
                     </Button>
+                    
+                    <div className="sm:grow w-[64px] flex align-center justify-end">
+                        <Button 
+                            className="mx-2"
+                            variant="text"
+                            onClick={restart}
+                        >
+                            <RestartAltIcon color="warning" sx={{ fontSize: 48 }}></RestartAltIcon>
+                            
+                        </Button>
+                    </div>
                 </div>
+
+                
             </div>
 
             <ProgressBar key="stamina" 
