@@ -1,6 +1,7 @@
-// db.ts
-import { ArmorEntity, FoodEntity, SettingEntity, SkillEntity } from '@/database/entities';
-import { initializeArmor, initializeSettings, initializeSkills } from '@/database/init';
+import { armorColumns, ArmorEntity, initializeArmor } from '@/database/tables/armors';
+import { foodColumns, FoodEntity, initializeFood } from '@/database/tables/food';
+import { settingColumns, SettingEntity, initializeSettings } from '@/database/tables/settings';
+import { skillColumns, SkillEntity, initializeSkills } from '@/database/tables/skills';
 import Dexie, { type EntityTable } from 'dexie';
 
 export type BitcraftCalculatorDatabase = Dexie & {
@@ -11,49 +12,6 @@ export type BitcraftCalculatorDatabase = Dexie & {
 };
 
 const calculatorDatabase = new Dexie('BitcraftCalculatorDatabase') as BitcraftCalculatorDatabase;
-
-const skillColumns = (
-    [
-        'id',
-        'name',
-        'selected',
-        'power',
-        'type',
-    ] satisfies Array<keyof SkillEntity>
-);
-
-const armorColumns = (
-    [
-        'id',
-        'name',
-        'selected',
-        'stamina',
-        'gatherBonus',
-        'craftBonus',
-        'buildBonus'
-    ] satisfies Array<keyof ArmorEntity>
-);
-armorColumns[0] = `++${armorColumns[0]}` as any; //autoincrement definition
-
-const foodColumns = (
-    [
-        'id',  //type / tier slug
-        'tier',
-        'type',
-        'selected',
-        'staminaRegen',
-        'gatherBonus',
-        'craftBonus',
-        'buildBonus'
-    ] satisfies Array<keyof FoodEntity>
-);
-
-const settingColumns = (
-    [
-        'id',
-        'value',
-    ] satisfies Array<keyof SettingEntity>
-);
 
 calculatorDatabase.version(1).stores({
     skills: skillColumns.join(", "),

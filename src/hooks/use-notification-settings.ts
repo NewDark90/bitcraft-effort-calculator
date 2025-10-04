@@ -1,7 +1,6 @@
-import { calculatorDatabase } from "@/database/db";
-import { NotificationStyle, settingKeys } from "@/database/entities";
+
+import { NotificationStyle } from "@/database/tables/settings";
 import { useSettings } from "@/hooks/use-settings";
-import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 
 export type UseNotificationSettingsReturn = { 

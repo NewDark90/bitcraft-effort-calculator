@@ -3,15 +3,17 @@ import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import NumberInput from "@/components/common/number-input";
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { useState } from "react";
-import { CraftingType, craftingTypeMap, craftingTypes } from "@/config/crafting-types";
+import { CraftingTier, craftingTierMap, craftingTiers } from "@/config/crafting-tiers";
 import React from "react";
 import SquareIcon from '@mui/icons-material/Square';
 import clsx from "clsx";
+import { TierNumber } from "@/config/tier";
+import { craftingTypes } from "@/config/crafting-types";
 
 export type CraftParametersProps = { 
     fullEffort: number;
     currentEffort: number;
-    craftType: CraftingType;
+    craftType: CraftingTier;
 
     isWorking: boolean;
     power?: number;
@@ -20,7 +22,7 @@ export type CraftParametersProps = {
 
     onFullEffortChange: (effort: number) => void;
     onCurrentEffortChange: (effort: number) => void;
-    onCraftTypeChange: (craftType: CraftingType) => void;
+    onCraftTypeChange: (craftType: CraftingTier) => void;
 };
 
 export default function CraftParameters(
@@ -37,7 +39,6 @@ export default function CraftParameters(
     }: CraftParametersProps
 ) {
     const id = React.useId();
-    const label = "Type";
 
     const effortChangeHandler = (
         effort: number | null, 
@@ -49,8 +50,8 @@ export default function CraftParameters(
         changeHandler(effort);
     }
 
-    const craftingTypeChangeHandler = (event: SelectChangeEvent) => {
-        const type = craftingTypeMap.get(event.target.value as string);
+    const craftingTierChangeHandler = (event: SelectChangeEvent) => {
+        const type = craftingTierMap.get(parseInt(event.target.value) as TierNumber);
         if (type == null) {
             return;
         }
@@ -90,16 +91,42 @@ export default function CraftParameters(
                 className="mx-4"
                 >
                 <InputLabel id={`crafting-type-label-${id}`}>
-                    {label}
+                    Type
                 </InputLabel>
                 <Select
                     labelId={`crafting-type-label-${id}`}
-                    label={label}
+                    label={"Type"}
                     value={craftType.name}
-                    onChange={craftingTypeChangeHandler}
+                    onChange={ }
                 >
                     {
                         craftingTypes.map(type => (
+                            <MenuItem
+                                value={type.slug}
+                                key={type.slug}
+                            >
+                                { type.name }
+                            </MenuItem>
+                        ))
+                    }
+                </Select>
+            </FormControl>
+
+            <FormControl 
+                sx={{ minWidth: 80 }}
+                className="mx-4"
+                >
+                <InputLabel id={`crafting-tier-label-${id}`}>
+                    {label}
+                </InputLabel>
+                <Select
+                    labelId={`crafting-tier-label-${id}`}
+                    label={label}
+                    value={craftType.name}
+                    onChange={craftingTierChangeHandler}
+                >
+                    {
+                        craftingTiers.map(type => (
                             <MenuItem
                                 value={type.name}
                                 key={type.name}

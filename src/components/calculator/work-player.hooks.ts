@@ -1,7 +1,10 @@
-import { CraftingType, craftingTypes } from "@/config/crafting-types";
+import { craftingTiers } from "@/config/crafting-tiers";
+import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
+import { getStaminaCost } from "@/config/stamina-costs";
+import { TierNumber } from "@/config/tier";
+import { getWorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
-import { ArmorEntity, settingKeys, SkillEntity } from "@/database/entities";
-import { useNotificationSettings } from "@/hooks/use-notification-settings";
+import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
 import { useServiceWorker } from "@/hooks/use-service-worker";
 import { useWakeLock } from "@/hooks/use-wake-lock";
 import { minmax } from "@/util/minmax";
@@ -13,12 +16,14 @@ export type UseWorkPlayerStateReturn = {
     fullEffort: number; 
     currentEffort: number; 
     currentStamina: number; 
-    craftingType: CraftingType; 
+    craftingType: CraftingTypeSlug; 
+    craftingTier: TierNumber; 
     isWorking: boolean; 
     workInterval: number;
     restart: () => void; 
     setIsWorking: Dispatch<SetStateAction<boolean>>; 
-    setCraftingType: Dispatch<SetStateAction<CraftingType>>; 
+    setCraftingType: Dispatch<SetStateAction<CraftingTypeSlug>>; 
+    setCraftingTier: Dispatch<SetStateAction<TierNumber>>; 
     setCurrentEffort: (effort: number) => number; 
     setFullEffort: (effort: number) => void; 
     doWork: (ratio?: number) => void; 
@@ -39,16 +44,19 @@ const flatStaminaRegenRate = 0.25;
 
 export const useWorkPlayerState = (
     armor: ArmorEntity,
-    skill: SkillEntity
+    skill: SkillEntity,
+    food: FoodEntity,
 ): UseWorkPlayerStateReturn => {
 
     const [fullEffort, _setFullEffort] = useLocalStorage('work-player.full-effort', 100);
     const [currentEffort, _setCurrentEffort] = useLocalStorage('work-player.current-effort', 0);
-    const [craftingType, _setCraftingType] = useLocalStorage('work-player.crafting-type', craftingTypes[0]);
+    const [craftingType, _setCraftingType] = useLocalStorage<CraftingTypeSlug>('work-player.crafting-type', craftingTypes[0].slug);
+    const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tier);
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
 
-    const workInterval = (armor.interval * 1000);
+    const workInterval = (getWorkInterval(craftingType) * 1000);
+    const staminaCost = getStaminaCost(craftingType, craftingTier);
 
     const setCurrentEffort = useCallback((effort: number) => {
         const newEffort = minmax(effort, 0, fullEffort);
@@ -69,13 +77,13 @@ export const useWorkPlayerState = (
     }, []);
 
     const doStaminaRegen = (ratio: number = 1) => {
-        const newStamina =  minmax(currentStamina + ((flatStaminaRegenRate + armor.regenPerSecond) * ratio), 0, armor.stamina);
+        const newStamina =  minmax(currentStamina + ((flatStaminaRegenRate + food.staminaRegen) * ratio), 0, armor.stamina);
         _setCurrentStamina(newStamina); 
         return newStamina;
     }
 
     const doWork = (ratio: number = 1) => {
-        const newStamina = currentStamina - (craftingType.staminaCost * ratio);
+        const newStamina = currentStamina - (staminaCost * ratio);
         if (newStamina <= 0) {
             // Stop, not done
             _setIsWorking(false);
@@ -98,27 +106,27 @@ export const useWorkPlayerState = (
 
         while(
             timeDelta >= workInterval && 
-            newStamina >= craftingType.staminaCost && 
+            newStamina >= staminaCost && 
             newEffort < fullEffort
         ) {
             timeDelta =- workInterval;
-            newStamina =- craftingType.staminaCost;
+            newStamina =- staminaCost;
             newEffort += skill.power;
         }   
 
-        if (newStamina < craftingType.staminaCost) {
+        if (newStamina < staminaCost) {
             _setIsWorking(false);
         }
 
         setCurrentEffort(newEffort);
 
         const staminaTicks = Math.floor(timeDelta / 1000);
-        const staminaRegenerated = (flatStaminaRegenRate + armor.regenPerSecond) * staminaTicks;
+        const staminaRegenerated = (flatStaminaRegenRate + food.staminaRegen) * staminaTicks;
         _setCurrentStamina(minmax(newStamina + staminaRegenerated, 0, armor.stamina));      
     }
 
     const getWorkProgressStats = (): WorkProgressStats => {
-        const remainingStaminaIterations = Math.floor(currentStamina / craftingType.staminaCost);
+        const remainingStaminaIterations = Math.floor(currentStamina / staminaCost);
         const neededStaminaIterations = Math.ceil((fullEffort - currentEffort) / skill.power);
 
         const willComplete = remainingStaminaIterations <= neededStaminaIterations;
@@ -128,8 +136,8 @@ export const useWorkPlayerState = (
         const remainingWorkTimeMs = staminaIterations * workInterval;
         const remainingEffort = staminaIterations * skill.power;
 
-        const staminaAfterWorkIterations = currentStamina - (staminaIterations * craftingType.staminaCost);
-        const timeToRegenerateStaminaMs = ((armor.stamina - staminaAfterWorkIterations) / (flatStaminaRegenRate + armor.regenPerSecond)) * 1000;
+        const staminaAfterWorkIterations = currentStamina - (staminaIterations * staminaCost);
+        const timeToRegenerateStaminaMs = ((armor.stamina - staminaAfterWorkIterations) / (flatStaminaRegenRate + food.staminaRegen)) * 1000;
 
         return {
             willComplete,
@@ -145,12 +153,14 @@ export const useWorkPlayerState = (
         currentEffort,
         currentStamina,
         craftingType,
+        craftingTier,
         isWorking,
         workInterval,
 
         restart,
         setIsWorking: _setIsWorking,
         setCraftingType: _setCraftingType,
+        setCraftingTier: _setCraftingTier,
         setCurrentEffort,
         setFullEffort,
         doWork, 

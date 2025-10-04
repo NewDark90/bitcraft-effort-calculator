@@ -34,22 +34,30 @@ export default function ArmorSelectButton(
                 </span>
             </span>
 
-            <span className="flex justify-center items-center"> 
-                <SkillIcon 
-                    folder="/other" 
-                    name="Interval" 
-                    size={24}
-                    className="invert-0 dark:invert inline-block"
-                ></SkillIcon>
+            <span className="flex flex-col justify-center items-center"> 
+                <span>
+                    Gather
+                </span>
                 <span className="mx-2">
-                    {armor?.interval ?? 0}
+                    {armor?.gatherBonus ?? 0}%
                 </span>
             </span>
 
-            <span className="flex justify-center items-center">
-                <AutorenewIcon htmlColor="var(--energy, yellow)"></AutorenewIcon>
+            <span className="flex flex-col justify-center items-center"> 
+                <span>
+                    Craft
+                </span>
                 <span className="mx-2">
-                    {armor?.regenPerSecond ?? 0}
+                    {armor?.craftBonus ?? 0}%
+                </span>
+            </span>
+
+            <span className="flex flex-col justify-center items-center"> 
+                <span>
+                    Build
+                </span>
+                <span className="mx-2">
+                    {armor?.buildBonus ?? 0}%
                 </span>
             </span>
            

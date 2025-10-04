@@ -1,15 +1,16 @@
-import { ArmorEntity, SkillEntity } from "@/database/entities";
-import { CraftingType } from "@/config/crafting-types";
+
+import { CraftingTier } from "@/config/crafting-tiers";
 import humanizeDuration from 'humanize-duration';
 import { Theme, useTheme } from "@mui/material";
-import clsx from "clsx";
+import { SkillEntity } from "@/database/tables/skills";
+import { ArmorEntity } from "@/database/tables/armors";
 
 export type WorkStatisticsProps = { 
     
     skill: SkillEntity;
     armor: ArmorEntity;
 
-    craftingType: CraftingType;
+    craftingType: CraftingTier;
     fullEffort: number;
     currentEffort: number;
     currentStamina: number;

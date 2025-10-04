@@ -1,5 +1,6 @@
 import { calculatorDatabase } from "@/database/db";
-import { IDBValidProp, NotificationStyle, SettingEntity, SettingKeyType } from "@/database/entities";
+import { NotificationStyle, SettingEntity, SettingKeyType } from "@/database/tables/settings";
+import { IDBValidProp } from "@/database/util";
 import { useLiveQuery } from "dexie-react-hooks";
 
 export const useSettings = (

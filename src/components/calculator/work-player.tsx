@@ -1,6 +1,5 @@
 import CraftParameters from "@/components/calculator/craft-parameters";
 import ProgressBar from "@/components/progress-bar";
-import { SkillEntity, ArmorEntity } from "@/database/entities";
 import { Button } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
@@ -9,6 +8,7 @@ import WorkStatistics from "@/components/calculator/work-statistics";
 import { useWorkPlayerState } from "@/components/calculator/work-player.hooks";
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
+import { ArmorEntity, SkillEntity } from "@/database/tables";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
