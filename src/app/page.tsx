@@ -1,24 +1,23 @@
 'use client'
 
-import NumberInput from "@/components/common/number-input";
 import ArmorSelectButton from "@/components/calculator/armor-select-button";
-import SkillIcon from "@/components/skill-icon";
 import SkillSelectButton from "@/components/calculator/skill-select-button";
 import { armorService } from "@/services/armor-service";
 import { skillService } from "@/services/skill-service";
 import { useLiveQuery } from "dexie-react-hooks";
 import { NoSSR } from 'next-dynamic-no-ssr';
-import Image from "next/image";
-import { useState } from "react";
-import CraftParameters from "@/components/calculator/craft-parameters";
-import ProgressBar from "@/components/progress-bar";
 import WorkPlayer from "@/components/calculator/work-player";
-import SettingsDialog from "@/components/settings/settings-dialog";
+import { calculatorDatabase, FoodEntity } from "@/database";
+import FoodSelectButton from "@/components/calculator/food-select-button";
+import { useState } from "react";
+import { CraftingTypeSlug } from "@/config/crafting-types";
 
 export default function Home() {
 
     const selectedSkill = useLiveQuery(async () => await skillService.getSelectedSkill());
     const selectedArmor = useLiveQuery(async () => await armorService.getSelectedArmor());
+    const selectedFood = useLiveQuery(async () => await calculatorDatabase.foods.where("selected" satisfies keyof FoodEntity).equals(1).first());
+    const [selectedType, setSelectedType] = useState<CraftingTypeSlug>();
 
     return (
         <NoSSR>
@@ -28,16 +27,25 @@ export default function Home() {
 
                 </SkillSelectButton>
 
-                <ArmorSelectButton armor={ selectedArmor } >
+                <ArmorSelectButton armor={ selectedArmor } craftType={ selectedType }>
                     
                 </ArmorSelectButton>
 
+                <FoodSelectButton food={ selectedFood } craftType={ selectedType }>
+
+                </FoodSelectButton>
             </div>
 
             {
                 (selectedArmor != null && selectedSkill != null) 
                 &&
-                <WorkPlayer armor={selectedArmor} skill={selectedSkill}>
+                <WorkPlayer 
+                    armor={selectedArmor} 
+                    skill={selectedSkill} 
+                    food={selectedFood}
+                    onCraftingTypeChange={(type) => {
+                        setSelectedType(type);
+                    }}>
 
                 </WorkPlayer>
             }

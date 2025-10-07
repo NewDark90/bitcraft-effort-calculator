@@ -1,16 +1,20 @@
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import ButtonLink from "@/components/common/button-link";
-import SkillIcon from "@/components/skill-icon";
-import { ArmorEntity } from "@/database/entities";
-import AutorenewIcon from '@mui/icons-material/Autorenew';
+import { ArmorEntity } from "@/database/tables";
+import { CraftingTypeSlug } from '@/config/crafting-types';
+import { useTheme } from '@mui/material/styles';
 
 export type ArmorSelectButtonProps = { 
     armor?: ArmorEntity,
+    craftType?: CraftingTypeSlug;
 };
 
 export default function ArmorSelectButton(
-    { armor }: ArmorSelectButtonProps
+    { armor, craftType }: ArmorSelectButtonProps
 ) {
+
+    const theme = useTheme();
+    
     let buttonTitle = `Armor`;
     if (armor?.name) {
         buttonTitle += ` - ${armor?.name}`
@@ -26,38 +30,46 @@ export default function ArmorSelectButton(
                 {buttonTitle}
             </span>
 
-
-            <span className="flex justify-center items-center">
+            <span className="flex flex-col justify-center items-center">
                 <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
                 <span className="mx-2">
                     {armor?.stamina ?? 0}
                 </span>
             </span>
 
-            <span className="flex flex-col justify-center items-center"> 
+            <span className="flex flex-col justify-center items-center"
+                style={{
+                    color: craftType === "gather" ? theme.palette.success.main : ""
+                }}> 
                 <span>
                     Gather
                 </span>
                 <span className="mx-2">
-                    {armor?.gatherBonus ?? 0}%
+                    {((armor?.gatherBonus ?? 0) * 100).toFixed(2)}%
                 </span>
             </span>
 
-            <span className="flex flex-col justify-center items-center"> 
+            <span className="flex flex-col justify-center items-center"
+                style={{
+                    color: craftType === "craft" ? theme.palette.success.main : ""
+                }}> 
                 <span>
                     Craft
                 </span>
                 <span className="mx-2">
-                    {armor?.craftBonus ?? 0}%
+                    {((armor?.craftBonus ?? 0) * 100).toFixed(2)}%
                 </span>
             </span>
 
-            <span className="flex flex-col justify-center items-center"> 
+            <span className="flex flex-col justify-center items-center"
+                style={{
+                    color: craftType === "build" ? theme.palette.success.main : ""
+                }}> 
                 <span>
                     Build
                 </span>
                 <span className="mx-2">
-                    {armor?.buildBonus ?? 0}%
+                    {((armor?.buildBonus ?? 0) * 100).toFixed(2)}%
                 </span>
             </span>
            

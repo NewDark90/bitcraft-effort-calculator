@@ -3,10 +3,9 @@
 import NumberInput from "@/components/common/number-input";
 import SkillIcon from "@/components/skill-icon";
 import { skillService } from "@/services/skill-service";
-import { useState } from "react";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckIcon from '@mui/icons-material/Check';
-import { SkillEntity } from "@/database/entities";
+import { SkillEntity } from "@/database/tables";
 
 
 export type SkillProps = { 

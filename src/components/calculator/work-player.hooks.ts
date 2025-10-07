@@ -2,7 +2,7 @@ import { craftingTiers } from "@/config/crafting-tiers";
 import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
 import { getStaminaCost } from "@/config/stamina-costs";
 import { TierNumber } from "@/config/tier";
-import { getWorkInterval } from "@/config/work-intervals";
+import { getWorkInterval, WorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
 import { useServiceWorker } from "@/hooks/use-service-worker";
@@ -19,7 +19,8 @@ export type UseWorkPlayerStateReturn = {
     craftingType: CraftingTypeSlug; 
     craftingTier: TierNumber; 
     isWorking: boolean; 
-    workInterval: number;
+    workInterval: WorkInterval;
+    staminaCost: number;
     restart: () => void; 
     setIsWorking: Dispatch<SetStateAction<boolean>>; 
     setCraftingType: Dispatch<SetStateAction<CraftingTypeSlug>>; 
@@ -45,18 +46,19 @@ const flatStaminaRegenRate = 0.25;
 export const useWorkPlayerState = (
     armor: ArmorEntity,
     skill: SkillEntity,
-    food: FoodEntity,
+    food?: FoodEntity,
 ): UseWorkPlayerStateReturn => {
 
     const [fullEffort, _setFullEffort] = useLocalStorage('work-player.full-effort', 100);
     const [currentEffort, _setCurrentEffort] = useLocalStorage('work-player.current-effort', 0);
     const [craftingType, _setCraftingType] = useLocalStorage<CraftingTypeSlug>('work-player.crafting-type', craftingTypes[0].slug);
-    const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tier);
+    const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tierId);
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
 
-    const workInterval = (getWorkInterval(craftingType) * 1000);
+    const workInterval = getWorkInterval(craftingType, [armor, food]);
     const staminaCost = getStaminaCost(craftingType, craftingTier);
+    const staminaRegenRate = flatStaminaRegenRate + (food?.staminaRegen ?? 0);
 
     const setCurrentEffort = useCallback((effort: number) => {
         const newEffort = minmax(effort, 0, fullEffort);
@@ -77,7 +79,7 @@ export const useWorkPlayerState = (
     }, []);
 
     const doStaminaRegen = (ratio: number = 1) => {
-        const newStamina =  minmax(currentStamina + ((flatStaminaRegenRate + food.staminaRegen) * ratio), 0, armor.stamina);
+        const newStamina =  minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
         _setCurrentStamina(newStamina); 
         return newStamina;
     }
@@ -105,11 +107,11 @@ export const useWorkPlayerState = (
         let newEffort = currentEffort;
 
         while(
-            timeDelta >= workInterval && 
+            timeDelta >= workInterval.effectiveMs && 
             newStamina >= staminaCost && 
             newEffort < fullEffort
         ) {
-            timeDelta =- workInterval;
+            timeDelta =- workInterval.effectiveMs;
             newStamina =- staminaCost;
             newEffort += skill.power;
         }   
@@ -121,11 +123,27 @@ export const useWorkPlayerState = (
         setCurrentEffort(newEffort);
 
         const staminaTicks = Math.floor(timeDelta / 1000);
-        const staminaRegenerated = (flatStaminaRegenRate + food.staminaRegen) * staminaTicks;
+        const staminaRegenerated = staminaRegenRate * staminaTicks;
         _setCurrentStamina(minmax(newStamina + staminaRegenerated, 0, armor.stamina));      
     }
 
     const getWorkProgressStats = (): WorkProgressStats => {
+
+        /*
+        // Ratios
+        const powerPerStamina = skill.power / craftingType.staminaCost;
+        const powerPerSecond = skill.power / armor.interval;
+
+        // Single Stamina Bar calculations
+        const staminaIterations = Math.floor(armor.stamina / craftingType.staminaCost);
+        const effortPerStaminaBar = staminaIterations * skill.power;
+        const timePerStaminaBar = staminaIterations * armor.interval;
+
+        // Full Effort Calculations
+        const timeStaminaWaiting = (Math.max(fullEffort - effortPerStaminaBar, 0) / powerPerStamina / (armor.regenPerSecond + 0.25));
+        const timeEffortCrafting = fullEffort / powerPerSecond;
+        */
+
         const remainingStaminaIterations = Math.floor(currentStamina / staminaCost);
         const neededStaminaIterations = Math.ceil((fullEffort - currentEffort) / skill.power);
 
@@ -133,11 +151,11 @@ export const useWorkPlayerState = (
         //We either run out of stamina or complete the work, whatever comes first.
         const staminaIterations = Math.min(remainingStaminaIterations, neededStaminaIterations);
 
-        const remainingWorkTimeMs = staminaIterations * workInterval;
+        const remainingWorkTimeMs = staminaIterations * workInterval.effectiveMs;
         const remainingEffort = staminaIterations * skill.power;
 
         const staminaAfterWorkIterations = currentStamina - (staminaIterations * staminaCost);
-        const timeToRegenerateStaminaMs = ((armor.stamina - staminaAfterWorkIterations) / (flatStaminaRegenRate + food.staminaRegen)) * 1000;
+        const timeToRegenerateStaminaMs = ((armor.stamina - staminaAfterWorkIterations) / staminaRegenRate) * 1000;
 
         return {
             willComplete,
@@ -156,6 +174,7 @@ export const useWorkPlayerState = (
         craftingTier,
         isWorking,
         workInterval,
+        staminaCost,
 
         restart,
         setIsWorking: _setIsWorking,
@@ -278,7 +297,7 @@ const useWorkPlayerInteractivity = (
         () => {
             doWork(1)
         },
-        isWorking && isFocused ? workInterval : null
+        isWorking && isFocused ? workInterval.effectiveMs : null
     )
 
     // Stamina Regen

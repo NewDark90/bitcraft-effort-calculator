@@ -1,15 +1,13 @@
 'use client'
 
-import Image from "next/image";
-import Link from "next/link";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { armorService } from "@/services/armor-service";
 import Armor from "@/app/armor-select/armor";
 import { useEffect, useState } from "react";
-import { ArmorEntity } from "@/database/entities";
+import { ArmorEntity } from "@/database/tables";
 import { Button } from "@mui/material";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { NoSSR } from "next-dynamic-no-ssr";
+import CalculatorNavLink from "@/components/calculator-nav-link";
 
 export default function ArmorSelect() {
 
@@ -22,14 +20,8 @@ export default function ArmorSelect() {
 
     return (
         <NoSSR>
-            <nav>
-                <Link
-                    className="m-2 flex justify-baseline font-bold"
-                    href={`../`}
-                >
-                    <ChevronLeftIcon className="mx-1"></ChevronLeftIcon>
-                    Calculator
-                </Link>
+            <nav className="my-8">
+                <CalculatorNavLink></CalculatorNavLink>
             </nav>
             <div className="flex gap-4 flex-wrap flex-col sm:flex-row">
                 {

@@ -1,16 +1,10 @@
 'use client'
 
 import Skill from "@/app/skill-select/skill";
-import { professions } from "@/config/professions";
-import { skills } from "@/config/skills";
 import { skillService } from "@/services/skill-service";
 import { NoSSR } from 'next-dynamic-no-ssr';
-import { useState } from "react";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import Link from "next/link";
-import { SkillEntity } from "@/database/entities";
 import { useLiveQuery } from "dexie-react-hooks";
-import { calculatorDatabase } from "@/database/db";
+import CalculatorNavLink from "@/components/calculator-nav-link";
 
 
 export default function SkillSelect() {
@@ -21,14 +15,8 @@ export default function SkillSelect() {
 
     return (
         <NoSSR>
-            <nav>
-                <Link
-                    className="m-2 flex justify-baseline font-bold"
-                    href={`../`}
-                >
-                    <ChevronLeftIcon className="mx-1 "></ChevronLeftIcon>
-                    Calculator
-                </Link>
+            <nav className="my-8">
+                <CalculatorNavLink></CalculatorNavLink>
             </nav>
             <section className="w-full">
                 <h2 className={titleCss}>

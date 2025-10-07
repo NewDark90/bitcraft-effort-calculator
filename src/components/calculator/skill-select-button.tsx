@@ -1,6 +1,6 @@
 import ButtonLink from "@/components/common/button-link";
 import SkillIcon from "@/components/skill-icon";
-import { SkillEntity } from "@/database/entities";
+import { SkillEntity } from "@/database/tables";
 import Image from "next/image";
 
 export type SkillSelectButtonProps = { skill?: SkillEntity };

@@ -8,25 +8,40 @@ import WorkStatistics from "@/components/calculator/work-statistics";
 import { useWorkPlayerState } from "@/components/calculator/work-player.hooks";
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
-import { ArmorEntity, SkillEntity } from "@/database/tables";
+import { ArmorEntity, FoodEntity, SkillEntity } from "@/database/tables";
+import { CraftingTypeSlug } from "@/config/crafting-types";
+import { useEffect } from "react";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
     armor: ArmorEntity;
+    food?: FoodEntity;
+    onCraftingTypeChange?: (type: CraftingTypeSlug) => void;
 };
 
 export default function WorkPlayer(
-    { skill, armor }: WorkPlayerProps
+    { 
+        skill, 
+        armor, 
+        food, 
+        onCraftingTypeChange 
+    }: WorkPlayerProps
 ) {
 
     const {
         fullEffort, setFullEffort,
         currentEffort, setCurrentEffort,
         craftingType, setCraftingType,
+        craftingTier, setCraftingTier,
+        workInterval,
         currentStamina, 
         isWorking, setIsWorking,
         doWork, restart,
-    } = useWorkPlayerState(armor, skill);
+    } = useWorkPlayerState(armor, skill, food);
+
+    useEffect(() => {
+        onCraftingTypeChange?.(craftingType);
+    }, [craftingType])
 
     return (
         <div className="w-full">
@@ -41,10 +56,12 @@ export default function WorkPlayer(
                     fullEffort={fullEffort}
                     currentEffort={currentEffort}
                     craftType={craftingType}
-                    power={skill.power}
+                    craftingTier={craftingTier}
+                    workInterval={workInterval}
                     isWorking={isWorking}
 
                     onCraftTypeChange={(type) => { setCraftingType(type) }}
+                    onCraftTierChange={(tier) => { setCraftingTier(tier) }}
                     onCurrentEffortChange={(effort) => { setCurrentEffort(effort); }}
                     onFullEffortChange={(effort) => { setFullEffort(effort); }}
                 >

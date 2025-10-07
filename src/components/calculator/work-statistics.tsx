@@ -4,13 +4,14 @@ import humanizeDuration from 'humanize-duration';
 import { Theme, useTheme } from "@mui/material";
 import { SkillEntity } from "@/database/tables/skills";
 import { ArmorEntity } from "@/database/tables/armors";
+import { CraftingTypeSlug } from "@/config/crafting-types";
 
 export type WorkStatisticsProps = { 
     
     skill: SkillEntity;
     armor: ArmorEntity;
 
-    craftingType: CraftingTier;
+    craftingType: CraftingTypeSlug;
     fullEffort: number;
     currentEffort: number;
     currentStamina: number;
@@ -38,7 +39,8 @@ export default function WorkStatistics({
     currentEffort,
     currentStamina
 }: WorkStatisticsProps) {
-
+    return <></>
+/* 
     
     const theme = useTheme();
 
@@ -64,10 +66,10 @@ export default function WorkStatistics({
             { row(<span>Time Waiting</span>, humanize(timeStaminaWaiting * 1000), theme) }
 
 
-            
-            { /* row(<span></span>, ) */}
+        
         </div>
     );
+    */
 }
  
  

@@ -3,7 +3,7 @@
 import NumberInput from "@/components/common/number-input";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckIcon from '@mui/icons-material/Check';
-import { ArmorEntity } from "@/database/entities";
+import { ArmorEntity } from "@/database/tables";
 import { Button, TextField } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
@@ -63,53 +63,71 @@ export default function Armor(
                 step={1}
                 min={0}
                 onValueChange={(stamina) => {
-                    onArmorChange?.({...armor, stamina: stamina ?? armor.stamina});
+                    if (stamina == null) 
+                        return;
+                    onArmorChange?.({...armor, stamina: stamina });
                 }}
             >
             </NumberInput>
 
             <NumberInput 
                 className="my-2"
-                value={armor.interval} 
+                value={(armor.gatherBonus ?? 0) * 100} 
                 label={
-                    <>
-                        <SkillIcon 
-                            folder="/other" 
-                            name="Interval" 
-                            size={24}
-                            className="invert-0 dark:invert inline-block mx-1"
-                        ></SkillIcon>
-                        <span className="mx-1">Interval</span>
-                    </>
-                }
-                step={0.01}
-                min={0.01}
-                format={{
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }}
-                onValueChange={(interval) => {
-                    onArmorChange?.({...armor, interval: interval ?? armor.interval});
-                }}
-            >
-            </NumberInput>
-
-            <NumberInput 
-                className="my-2"
-                value={armor.regenPerSecond} 
-                label={
-                    <>
-                        <AutorenewIcon className="mx-1" htmlColor="var(--energy, yellow)" />
-                        <span className="mx-1">Stamina Regen</span>
-                    </>
+                    <span className="mx-1">Gather Bonus %</span>
                 }
                 step={1}
-                min={0}
-                onValueChange={(regenPerSecond) => {
-                    onArmorChange?.({...armor, regenPerSecond: regenPerSecond ?? armor.regenPerSecond});
+                min={0.01}
+                format={{
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }}
+                onValueChange={(gatherBonusPercent) => {
+                    if (gatherBonusPercent == null) 
+                        return;
+                    onArmorChange?.({...armor, gatherBonus: gatherBonusPercent / 100 });
                 }}
             >
+            </NumberInput>
 
+            <NumberInput 
+                className="my-2"
+                value={(armor.craftBonus ?? 0) * 100} 
+                label={
+                    <span className="mx-1">Craft Bonus %</span>
+                }
+                step={1}
+                min={0.01}
+                format={{
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }}
+                onValueChange={(craftBonusPercent) => {
+                    if (craftBonusPercent == null) 
+                        return;
+                    onArmorChange?.({...armor, craftBonus: craftBonusPercent / 100 });
+                }}
+            >
+            </NumberInput>
+
+            <NumberInput 
+                className="my-2"
+                value={(armor.buildBonus ?? 0) * 100} 
+                label={
+                    <span className="mx-1">Build Bonus %</span>
+                }
+                step={1}
+                min={0.01}
+                format={{
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }}
+                onValueChange={(buildBonusPercent) => {
+                    if (buildBonusPercent == null) 
+                        return;
+                    onArmorChange?.({...armor, buildBonus: buildBonusPercent / 100 });
+                }}
+            >
             </NumberInput>
 
             <Button 

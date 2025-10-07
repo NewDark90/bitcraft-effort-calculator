@@ -8,21 +8,25 @@ import React from "react";
 import SquareIcon from '@mui/icons-material/Square';
 import clsx from "clsx";
 import { TierNumber } from "@/config/tier";
-import { craftingTypes } from "@/config/crafting-types";
+import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
+import TierSelector from "@/components/tier-selector";
+import SkillIcon from "@/components/skill-icon";
+import { WorkInterval } from "@/config/work-intervals";
 
 export type CraftParametersProps = { 
     fullEffort: number;
     currentEffort: number;
-    craftType: CraftingTier;
-
+    craftType: CraftingTypeSlug;
+    craftingTier: TierNumber;
+    workInterval: WorkInterval;
     isWorking: boolean;
-    power?: number;
 
     className?: string;
 
     onFullEffortChange: (effort: number) => void;
     onCurrentEffortChange: (effort: number) => void;
-    onCraftTypeChange: (craftType: CraftingTier) => void;
+    onCraftTypeChange: (craftType: CraftingTypeSlug) => void;
+    onCraftTierChange: (craftType: TierNumber) => void;
 };
 
 export default function CraftParameters(
@@ -30,33 +34,17 @@ export default function CraftParameters(
         fullEffort, 
         currentEffort, 
         craftType, 
-        power,
+        craftingTier,
+        workInterval,
         isWorking,
         className,
         onCurrentEffortChange, 
         onFullEffortChange, 
-        onCraftTypeChange 
+        onCraftTypeChange,
+        onCraftTierChange
     }: CraftParametersProps
 ) {
     const id = React.useId();
-
-    const effortChangeHandler = (
-        effort: number | null, 
-        changeHandler: (effort: number) => void
-    ) => {
-        if (effort == null) {
-            return;
-        }
-        changeHandler(effort);
-    }
-
-    const craftingTierChangeHandler = (event: SelectChangeEvent) => {
-        const type = craftingTierMap.get(parseInt(event.target.value) as TierNumber);
-        if (type == null) {
-            return;
-        }
-        onCraftTypeChange(type);
-    }
 
     return (
         <div className={clsx("flex flex-wrap items-end justify-center my-2", className)}>
@@ -70,7 +58,11 @@ export default function CraftParameters(
                     min={ 0 }
                     max={ fullEffort }
                     readOnly={ isWorking }
-                    onValueChange={(effort) => effortChangeHandler(effort, onCurrentEffortChange)}
+                    onValueChange={(effort) => {
+                        if (effort == null) 
+                            return;
+                        onCurrentEffortChange(effort);
+                    }}
                 >
                 </NumberInput>
                 <span className="font-extrabold text-2xl my-1">/</span>
@@ -81,7 +73,11 @@ export default function CraftParameters(
                     step={ 0 }
                     min={ 0 }
                     readOnly={ isWorking }
-                    onValueChange={(effort) => effortChangeHandler(effort, onFullEffortChange)}
+                    onValueChange={(effort) => {
+                        if (effort == null) 
+                            return;
+                        onFullEffortChange(effort);
+                    }}
                 >
                 </NumberInput>
             </div>
@@ -96,8 +92,14 @@ export default function CraftParameters(
                 <Select
                     labelId={`crafting-type-label-${id}`}
                     label={"Type"}
-                    value={craftType.name}
-                    onChange={ }
+                    value={craftType}
+                    onChange={(event) => {
+                        const type = event.target.value as CraftingTypeSlug;
+                        if (type == null) {
+                            return;
+                        }
+                        onCraftTypeChange(type);
+                    }}
                 >
                     {
                         craftingTypes.map(type => (
@@ -112,33 +114,31 @@ export default function CraftParameters(
                 </Select>
             </FormControl>
 
-            <FormControl 
-                sx={{ minWidth: 80 }}
-                className="mx-4"
-                >
-                <InputLabel id={`crafting-tier-label-${id}`}>
-                    {label}
-                </InputLabel>
-                <Select
-                    labelId={`crafting-tier-label-${id}`}
-                    label={label}
-                    value={craftType.name}
-                    onChange={craftingTierChangeHandler}
-                >
-                    {
-                        craftingTiers.map(type => (
-                            <MenuItem
-                                value={type.name}
-                                key={type.name}
-                            >
-                                { type.name }
-                                &nbsp;
-                                { type.color && <SquareIcon htmlColor={type.color}></SquareIcon> }
-                            </MenuItem>
-                        ))
-                    }
-                </Select>
-            </FormControl>
+            {
+                (craftType == "gather" || craftType == "craft") 
+                &&
+                <TierSelector 
+                    tier={craftingTier}
+                    onTierChange={(tier) => {
+                        onCraftTierChange(tier);
+                    }}
+                    >
+
+                </TierSelector>
+            } 
+
+            <div className="flex flex-row flex-wrap item-center justify-center text-center self-center">
+                <span className="w-full">Interval</span>
+                <SkillIcon
+                    folder="/other"
+                    name="interval"
+                    size={24}
+                    className="invert-0 dark:invert inline-block"
+                ></SkillIcon>
+                <span className="m-2">{(workInterval.effective).toFixed(2)}</span>
+            </div>
+
+            
         </div>
     );
 }

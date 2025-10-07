@@ -1,5 +1,5 @@
 import { calculatorDatabase } from "@/database/db";
-import { SkillEntity, SkillEntityType } from "@/database/entities";
+import { SkillEntity, SkillEntityType } from "@/database/tables";
 
 export class SkillService {
 
