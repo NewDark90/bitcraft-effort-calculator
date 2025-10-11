@@ -6,9 +6,11 @@ import { getWorkInterval, WorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
 import { useServiceWorker } from "@/hooks/use-service-worker";
+import { useSettings } from "@/hooks/use-settings";
 import { useWakeLock } from "@/hooks/use-wake-lock";
+import { isAudioPlaying } from "@/util/isAudioPlaying";
 import { minmax } from "@/util/minmax";
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEventListener, useInterval, useLocalStorage } from "usehooks-ts";
 
 
@@ -32,6 +34,7 @@ export type UseWorkPlayerStateReturn = {
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
     doStaminaRegen: (ratio?: number) => void; 
+    tryPlayAudio: (type: "work-complete" | "stamina-complete") => void;
 };
 
 
@@ -118,6 +121,11 @@ export const useWorkPlayerState = (
     const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tierId);
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
+    const {
+        settings: {
+            playAlarmAudio
+        }
+     } = useSettings();
 
     const workInterval = getWorkInterval(craftingType, [armor, food]);
     const staminaCost = getStaminaCost(craftingType, craftingTier);
@@ -147,10 +155,22 @@ export const useWorkPlayerState = (
         return newStamina;
     }
 
+    const completeAudio = useMemo(() => new Audio('/sounds/complete.mp3'), []);
+    const tryPlayAudio = useCallback((type: "work-complete" | "stamina-complete") => {
+
+        if (type === "work-complete" && playAlarmAudio.value && !isAudioPlaying(completeAudio)) {
+            completeAudio.play();
+        } else if (type === "stamina-complete" && playAlarmAudio.value && !isAudioPlaying(completeAudio)) {
+            completeAudio.play();
+        }
+
+    }, [playAlarmAudio.value])
+
     const doWork = (ratio: number = 1) => {
         const newStamina = currentStamina - (staminaCost * ratio);
         if (newStamina <= 0) {
             // Stop, not done
+            tryPlayAudio("stamina-complete");
             _setIsWorking(false);
             return;
         }
@@ -160,6 +180,7 @@ export const useWorkPlayerState = (
 
         if (newEffort >= fullEffort) {
             // Stop, done.
+            tryPlayAudio("work-complete");
             _setIsWorking(false);
             return;
         }
@@ -192,9 +213,8 @@ export const useWorkPlayerState = (
 
 
     const workProgressStats = ((): WorkProgressStats => {
-
-        const powerPerStamina = skill.power / staminaCost;
-        const powerPerSecond = skill.power / workInterval.effective;
+        //const powerPerStamina = skill.power / staminaCost;
+        //const powerPerSecond = skill.power / workInterval.effective;
 
         // Stamina 
         const totalStaminaBarIterations = Math.floor(armor.stamina / staminaCost);
@@ -258,7 +278,7 @@ export const useWorkPlayerState = (
         };
     })();
 
-    const result = {
+    const result: UseWorkPlayerStateReturn = {
         fullEffort,
         currentEffort,
         currentStamina,
@@ -278,6 +298,7 @@ export const useWorkPlayerState = (
         doWork, 
         doWorkBatch,
         doStaminaRegen,
+        tryPlayAudio
     };
 
     useWorkPlayerInteractivity(result);
@@ -294,7 +315,8 @@ const useWorkPlayerInteractivity = (
         workInterval,
         doStaminaRegen,
         doWorkBatch,
-        workProgressStats
+        workProgressStats,
+        tryPlayAudio
     }: UseWorkPlayerInteractivityParameters
 ) => {
 
@@ -307,6 +329,7 @@ const useWorkPlayerInteractivity = (
         const messageResponse = message as unknown as ServiceWorkerMessageEventResponse;
         if (messageResponse.type === 'craft-notification.response.complete') {
             // Play sound if complete or out of stamina.
+            tryPlayAudio(messageResponse.payload.isComplete ? "work-complete" : "stamina-complete");
         }
 
     }
