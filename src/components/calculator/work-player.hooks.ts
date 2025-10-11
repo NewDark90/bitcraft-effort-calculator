@@ -21,6 +21,8 @@ export type UseWorkPlayerStateReturn = {
     isWorking: boolean; 
     workInterval: WorkInterval;
     staminaCost: number;
+    workProgressStats: WorkProgressStats;
+
     restart: () => void; 
     setIsWorking: Dispatch<SetStateAction<boolean>>; 
     setCraftingType: Dispatch<SetStateAction<CraftingTypeSlug>>; 
@@ -30,7 +32,6 @@ export type UseWorkPlayerStateReturn = {
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
     doStaminaRegen: (ratio?: number) => void; 
-    getWorkProgressStats: () => WorkProgressStats;
 };
 
 
@@ -41,7 +42,7 @@ export type WorkProgressStats = {
 
         /**  
          * How long will it take to complete a stamina bar? 
-         * (<full> - <remaining>) / <full> 
+         * ([full] - [remaining]) / [full] 
          * <currentStaminaTimeRemaining> / <fullStaminaTimeRemaining>
          */
         workTime: {
@@ -51,9 +52,19 @@ export type WorkProgressStats = {
             fullMs: number;
         }
 
+        /**
+         * How much effort will be completed with this stamina bar?
+         * ([full] - [remaining]) / [full] 
+         */
+        effort: {
+            // remainingEffort: number; 
+            remaining: number;
+            full: number;
+        }
+
         /** 
          * How long will it take to regenerate the stamina bar?
-         *  <timeToFull> / <full>
+         *  (timeToFull) / (full)
          */
         staminaRegen: {
             // timeToRegenerateStaminaMs: number;
@@ -61,35 +72,36 @@ export type WorkProgressStats = {
             timeToFullMs: number;
             fullMs: number;
         }
-
-        /**
-         * How much effort will be completed with this stamina bar?
-         * (<full> - <remaining>) / <full> 
-         */
-        effort: {
-            // remainingEffort: number; 
-            remaining: number;
-            full: number;
-        }
     }
 
     projectStats: {
-        // How long will it take to complete the whole craft?
-        // - <amountOfFullEffortTimeRemaining> / <amountOfTimeFullEffortToProcess>
+        /*
+         * How long will it take to complete the whole craft?
+         * - (amountOfFullEffortTimeRemaining) / (amountOfTimeFullEffortToProcess)
+         */
+        workTime: {
+            remainingMs: number;
+            fullMs: number;
+        }
 
-        // How many stamina bars will it take?
-        // - <currentNumberOfCompletedStaminaBars> / <neededStaminaBars>
+        /**
+         * How many stamina bars will it take?
+         * [currentNumberOfCompletedStaminaBars] / [neededStaminaBars]
+         */
+        staminaBar: {
+            remaining: number;
+            total: number;
+        }
 
-        // How long will the total downtime be between regenerations?
-        // - <currentTimeNeededToRegenAllStamina> / <fullTimeNeededToRegenAllStamina>
+        /**
+         * How long will the total downtime be between regenerations?
+         * [currentTimeNeededToRegenAllStamina] / [fullTimeNeededToRegenAllStamina]
+         */
+        staminaRegen: {
+            remainingMs: number;
+            fullMs: number;
+        }
     }
-    
-    willComplete: boolean; 
-    remainingWorkTimeMs: number; 
-    remainingEffort: number; 
-    timeToRegenerateStaminaMs: number;
-
-
 }
 
 const flatStaminaRegenRate = 0.25;
@@ -179,24 +191,12 @@ export const useWorkPlayerState = (
     }
 
 
-    const getWorkProgressStats = () => {
-
-        /*
-        // Ratios
-
-        // Single Stamina Bar calculations
-        const staminaIterations = Math.floor(armor.stamina / craftingType.staminaCost);
-        const effortPerStaminaBar = staminaIterations * skill.power;
-        const timePerStaminaBar = staminaIterations * armor.interval;
-
-        // Full Effort Calculations
-        const timeStaminaWaiting = (Math.max(fullEffort - effortPerStaminaBar, 0) / powerPerStamina / (armor.regenPerSecond + 0.25));
-        const timeEffortCrafting = fullEffort / powerPerSecond;
-        */
+    const workProgressStats = ((): WorkProgressStats => {
 
         const powerPerStamina = skill.power / staminaCost;
         const powerPerSecond = skill.power / workInterval.effective;
 
+        // Stamina 
         const totalStaminaBarIterations = Math.floor(armor.stamina / staminaCost);
         const remainingStaminaIterations = Math.floor(currentStamina / staminaCost);
         const neededStaminaIterations = Math.ceil((fullEffort - currentEffort) / skill.power);
@@ -209,38 +209,54 @@ export const useWorkPlayerState = (
         const fullStaminaEffort = totalStaminaBarIterations * skill.power;
         const remainingWorkTimeMs = staminaIterations * workInterval.effectiveMs;
         const remainingEffort = staminaIterations * skill.power;
-        const fullWorkTimeMs = staminaIterations * workInterval.effectiveMs;
+        const fullWorkTimeMs = totalStaminaBarIterations * workInterval.effectiveMs;
 
         const staminaAfterWorkIterations = currentStamina - (staminaIterations * staminaCost);
-        const timeToRegenerateStaminaMs = ((armor.stamina - staminaAfterWorkIterations) / staminaRegenRate) * 1000;
+        const timeToRegenerateStaminaMs = ((armor.stamina - currentStamina) / staminaRegenRate) * 1000;
         const fullTimeToRegenerateStaminaMs = (armor.stamina / staminaRegenRate) * 1000;
 
-        // How long will it take to complete a stamina bar?
-        // - <currentStaminaTimeRemaining> / <fullStaminaTimeRemaining>
+        // Project
+        const projectEffortTimeRemainingMs = Math.ceil(currentEffort / skill.power) * workInterval.effectiveMs; 
+        const projectEffortTimeFullMs = Math.ceil(fullEffort / skill.power) * workInterval.effectiveMs; 
 
-        // How long will it take to regenerate the stamina bar?
-        // - <currentTimeNeededToRegenStamina> / <fullTimeNeededToRegenStaminaBar>
+        const projectStaminaBarsRemaining = currentEffort / fullStaminaEffort;
+        const projectStaminaBarsTotal = fullEffort / fullStaminaEffort; 
 
-        // How much effort will be completed with this stamina bar?
-        // - <amountOfEffortThatCanBeProcessed> / <amountOfEffortAFullBarCanProcess>
-
-        // How long will it take to complete the whole craft?
-        // - <amountOfFullEffortTimeRemaining> / <amountOfTimeFullEffortToProcess>
-
-        // How many stamina bars will it take?
-        // - <currentNumberOfCompletedStaminaBars> / <neededStaminaBars>
-        
-        // How long will the total downtime be between regenerations?
-        // - <currentTimeNeededToRegenAllStamina> / <fullTimeNeededToRegenAllStamina>
+        const neededTimeToRegenerateFullJobStaminaMs = ((neededStaminaIterations * staminaCost) / staminaRegenRate * 1000);
+        const fullTimeToRegenerateFullJobStaminaMs = ((fullStaminaIterations * staminaCost) / staminaRegenRate * 1000)
 
         return {
-            willComplete,
-            staminaIterations,
-            remainingWorkTimeMs,
-            remainingEffort,
-            timeToRegenerateStaminaMs
+            staminaStats: {
+                willComplete,
+                workTime: {
+                    remainingMs: remainingWorkTimeMs,
+                    fullMs: fullWorkTimeMs
+                },
+                effort: {
+                    remaining: remainingEffort,
+                    full: fullStaminaEffort
+                },
+                staminaRegen: {
+                    timeToFullMs: timeToRegenerateStaminaMs,
+                    fullMs: fullTimeToRegenerateStaminaMs
+                }
+            },
+            projectStats: {
+                workTime: {
+                    remainingMs: projectEffortTimeRemainingMs, 
+                    fullMs: projectEffortTimeFullMs,
+                },
+                staminaBar: {
+                    remaining: projectStaminaBarsRemaining,
+                    total: projectStaminaBarsTotal,
+                }, 
+                staminaRegen: {
+                    remainingMs: neededTimeToRegenerateFullJobStaminaMs,
+                    fullMs: fullTimeToRegenerateFullJobStaminaMs,
+                }
+            },
         };
-    }
+    })();
 
     const result = {
         fullEffort,
@@ -251,6 +267,7 @@ export const useWorkPlayerState = (
         isWorking,
         workInterval,
         staminaCost,
+        workProgressStats,
 
         restart,
         setIsWorking: _setIsWorking,
@@ -261,7 +278,6 @@ export const useWorkPlayerState = (
         doWork, 
         doWorkBatch,
         doStaminaRegen,
-        getWorkProgressStats
     };
 
     useWorkPlayerInteractivity(result);
@@ -278,7 +294,7 @@ const useWorkPlayerInteractivity = (
         workInterval,
         doStaminaRegen,
         doWorkBatch,
-        getWorkProgressStats
+        workProgressStats
     }: UseWorkPlayerInteractivityParameters
 ) => {
 
@@ -316,13 +332,12 @@ const useWorkPlayerInteractivity = (
                     value: Date.now()
                 });
 
-                const stats = getWorkProgressStats();
                 if (serviceWorker.isRegistered) {
                     serviceWorker.postMessage({
                         type: "craft-notification.request.queue",
                         payload: {
-                            finishMs: stats.remainingWorkTimeMs,
-                            willComplete: stats.willComplete
+                            finishMs: workProgressStats.staminaStats.workTime.remainingMs,
+                            willComplete: workProgressStats.staminaStats.willComplete
                         }
                     } satisfies ServiceWorkerMessageEventRequest);
                 } else {

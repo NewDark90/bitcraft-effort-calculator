@@ -22,14 +22,13 @@ export default function SkillSelectButton(
             </span>
             
             <span className="flex justify-center items-center">
-                <Image
-                    aria-hidden
+                <SkillIcon 
                     className="invert-0 dark:invert -scale-x-100"
-                    src={`/skills/other/power.svg`}
-                    alt={`Power icon`}
-                    width={ 24 }
-                    height={ 24 }
-                />
+                    name={ "Power" } 
+                    size={ iconSize } 
+                    folder="/other"
+
+                ></SkillIcon>
                 <span className="mx-2">{skill?.power ?? 0}</span>
             </span>
 

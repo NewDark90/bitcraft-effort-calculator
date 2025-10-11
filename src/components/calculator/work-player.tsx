@@ -11,6 +11,8 @@ import RedoIcon from '@mui/icons-material/Redo';
 import { ArmorEntity, FoodEntity, SkillEntity } from "@/database/tables";
 import { CraftingTypeSlug } from "@/config/crafting-types";
 import { useEffect } from "react";
+import StaminaStatistics from "@/components/calculator/stamina-statistics";
+import ProjectStatistics from "@/components/calculator/project-statistics";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
@@ -35,6 +37,7 @@ export default function WorkPlayer(
         craftingTier, setCraftingTier,
         workInterval,
         currentStamina, 
+        workProgressStats,
         isWorking, setIsWorking,
         doWork, restart,
     } = useWorkPlayerState(armor, skill, food);
@@ -120,6 +123,8 @@ export default function WorkPlayer(
                 max={ armor?.stamina ?? 100 }>
             </ProgressBar>
 
+            <StaminaStatistics staminaStats={workProgressStats.staminaStats}></StaminaStatistics>
+
             <ProgressBar key="effort" 
                 className="my-4"
                 current={ currentEffort } 
@@ -127,6 +132,8 @@ export default function WorkPlayer(
                 barColor="var(--effort)">
                 
             </ProgressBar>
+            
+            <ProjectStatistics projectStats={workProgressStats.projectStats}></ProjectStatistics>
 
             <WorkStatistics 
                 skill={ skill } 
