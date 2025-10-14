@@ -5,7 +5,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import WorkStatistics from "@/components/calculator/work-statistics";
-import { useWorkPlayerState } from "@/components/calculator/work-player.hooks";
+import { useWorkPlayerInteractivity, useWorkPlayerState } from "@/components/calculator/work-player.hooks";
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import { ArmorEntity, FoodEntity, SkillEntity } from "@/database/tables";
@@ -30,6 +30,9 @@ export default function WorkPlayer(
     }: WorkPlayerProps
 ) {
 
+    const workPlayerState = useWorkPlayerState(armor, skill, food);
+    const workPlayerInterativity = useWorkPlayerInteractivity(workPlayerState);
+
     const {
         fullEffort, setFullEffort,
         currentEffort, setCurrentEffort,
@@ -40,7 +43,7 @@ export default function WorkPlayer(
         workProgressStats,
         isWorking, setIsWorking,
         doWork, restart,
-    } = useWorkPlayerState(armor, skill, food);
+    } = workPlayerState;
 
     useEffect(() => {
         onCraftingTypeChange?.(craftingType);

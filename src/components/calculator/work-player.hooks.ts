@@ -18,6 +18,7 @@ export type UseWorkPlayerStateReturn = {
     fullEffort: number; 
     currentEffort: number; 
     currentStamina: number; 
+    fullStamina: number;
     craftingType: CraftingTypeSlug; 
     craftingTier: TierNumber; 
     isWorking: boolean; 
@@ -31,6 +32,7 @@ export type UseWorkPlayerStateReturn = {
     setCraftingTier: Dispatch<SetStateAction<TierNumber>>; 
     setCurrentEffort: (effort: number) => number; 
     setFullEffort: (effort: number) => void; 
+    setCurrentStamina: (stamina: number) => void; 
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
     doStaminaRegen: (ratio?: number) => void; 
@@ -121,6 +123,7 @@ export const useWorkPlayerState = (
     const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tierId);
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
+
     const {
         settings: {
             playAlarmAudio
@@ -282,6 +285,7 @@ export const useWorkPlayerState = (
         fullEffort,
         currentEffort,
         currentStamina,
+        fullStamina: armor.stamina,
         craftingType,
         craftingTier,
         isWorking,
@@ -295,20 +299,19 @@ export const useWorkPlayerState = (
         setCraftingTier: _setCraftingTier,
         setCurrentEffort,
         setFullEffort,
+        setCurrentStamina: _setCurrentStamina,
         doWork, 
         doWorkBatch,
         doStaminaRegen,
         tryPlayAudio
     };
 
-    useWorkPlayerInteractivity(result);
-
     return result;
 }
 
 type UseWorkPlayerInteractivityParameters = UseWorkPlayerStateReturn;
 
-const useWorkPlayerInteractivity = (
+export const useWorkPlayerInteractivity = (
     {
         isWorking,
         doWork,
@@ -316,7 +319,11 @@ const useWorkPlayerInteractivity = (
         doStaminaRegen,
         doWorkBatch,
         workProgressStats,
-        tryPlayAudio
+        currentStamina,
+        setCurrentStamina,
+        fullStamina,
+        tryPlayAudio,
+        setIsWorking,
     }: UseWorkPlayerInteractivityParameters
 ) => {
 
@@ -324,6 +331,11 @@ const useWorkPlayerInteractivity = (
     const [isFocused, setIsFocused] = useState(true);
     //const [blurredStamp, _setBlurredStamp] = useLocalStorage<null|number>('work-player.blurred-stamp', null);
     const { wakeLock, wakeRelease } = useWakeLock();
+    const {
+        settings: {
+            networkDelay
+        }
+     } = useSettings();
 
     const onServiceWorkerMessage = (message: ServiceWorkerMessage) => {
         const messageResponse = message as unknown as ServiceWorkerMessageEventResponse;
@@ -344,7 +356,13 @@ const useWorkPlayerInteractivity = (
         if (serviceWorker.isSupported) {
             serviceWorker.register();
         }
-    }, [])
+    }, []);
+
+    // If the pool amount of stamina changes, make sure the current isn't out of bounds.
+    useEffect(() => {
+        setCurrentStamina(fullStamina);
+        setIsWorking(false);
+    }, [fullStamina]);
 
     useEventListener(
         "blur", 
@@ -409,7 +427,7 @@ const useWorkPlayerInteractivity = (
         () => {
             doWork(1)
         },
-        isWorking && isFocused ? workInterval.effectiveMs : null
+        isWorking && isFocused ? workInterval.effectiveMs + networkDelay.value : null
     )
 
     // Stamina Regen
@@ -417,7 +435,7 @@ const useWorkPlayerInteractivity = (
         () => {
             doStaminaRegen(1);  
         },
-        !isWorking && isFocused ? 1000 : null
+        !isWorking && isFocused ? 1000 + networkDelay.value : null
     )
 
     useEffect(() => {

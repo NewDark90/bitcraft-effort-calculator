@@ -14,7 +14,7 @@ export const useNotificationSettings = (
 ): UseNotificationSettingsReturn => {
 
     // Not supported by the browser
-    if (!("Notification" in window)) {
+    if (typeof window === "undefined" || !("Notification" in window)) {
         const fauxSetNotificationStyle = useCallback((style: string) => Promise.resolve(), []);
         return {
             notificationStyle: "never",

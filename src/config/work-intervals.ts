@@ -36,7 +36,7 @@ export function getWorkInterval<TBonus extends CraftBonusEntity>(
         })
         .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
-    const effective = base - (base * bonus);
+    const effective = base / (1 + bonus);
     
     return {
         base,

@@ -17,6 +17,7 @@ export default function ArmorSelect() {
             setArmors(initialArmors);
         })
     }, []);
+    
 
     return (
         <NoSSR>

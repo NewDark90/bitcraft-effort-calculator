@@ -41,6 +41,7 @@ export const useSettings = (
         settings: {
             notificationStyle: settingWrapper<NotificationStyle>(rawSettings, "notification-type", "when-away"),
             playAlarmAudio: settingWrapper<1 | 0>(rawSettings, "play-alarm-audio", 1),
+            networkDelay: settingWrapper<number>(rawSettings, "network-delay", 100),
         },
         saveSetting
     };

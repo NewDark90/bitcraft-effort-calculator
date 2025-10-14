@@ -1,7 +1,7 @@
 import Image from "next/image";
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import NumberInput from "@/components/common/number-input";
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { CraftingTier, craftingTierMap, craftingTiers } from "@/config/crafting-tiers";
 import React from "react";
@@ -127,16 +127,22 @@ export default function CraftParameters(
                 </TierSelector>
             } 
 
-            <div className="flex flex-row flex-wrap item-center justify-center text-center self-center">
-                <span className="w-full">Interval</span>
-                <SkillIcon
-                    folder="/other"
-                    name="interval"
-                    size={24}
-                    className="invert-0 dark:invert inline-block"
-                ></SkillIcon>
-                <span className="m-2">{(workInterval.effective).toFixed(2)}</span>
-            </div>
+            <Tooltip title={
+                <div className="text-base text-center">
+                    <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the "network delay" setting.</span>
+                </div>
+            }>
+                <div className="flex flex-row flex-wrap item-center justify-center text-center self-center">
+                    <span className="w-full">Interval</span>
+                    <SkillIcon
+                        folder="/other"
+                        name="interval"
+                        size={24}
+                        className="invert-0 dark:invert inline-block"
+                    ></SkillIcon>
+                    <span className="m-2">{(workInterval.effective).toFixed(2)}</span>
+                </div>
+            </Tooltip>
 
             
         </div>

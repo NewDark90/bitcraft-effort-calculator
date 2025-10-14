@@ -10,9 +10,16 @@ import {
     IconButton, 
     DialogTitle,
     CircularProgress,
-    DialogContent
+    DialogContent,
+    Tooltip,
+    Select,
+    MenuItem
 } from '@mui/material';
 import { useSettings } from '@/hooks/use-settings';
+import NumberInput from '@/components/common/number-input';
+import InfoIcon from '@mui/icons-material/Info';
+import { notificationStyles } from '@/database';
+import { useNotificationSettings } from '@/hooks/use-notification-settings';
 
 
 export type SettingsDialogProps = {
@@ -36,6 +43,10 @@ export default function SettingsDialog(
         isLoadingSettings,
         settings
     } = useSettings();
+
+    const {
+        setNotificationStyle
+    } = useNotificationSettings();
 
     return (
         <>
@@ -72,13 +83,76 @@ export default function SettingsDialog(
                     isLoadingSettings == null
                         ? <CircularProgress></CircularProgress>
                         : 
-                            <FormGroup>
-                                <FormControlLabel control={
-                                    <Switch 
-                                        checked={settings.playAlarmAudio.value === 1}  
-                                        onChange={event => settings.playAlarmAudio.save(event.target.checked ? 1 : 0)}
-                                    />
-                                } label="Play Audio Alarm" />
+                            <FormGroup className='[&>*]:m-1'>
+
+                                <FormControlLabel 
+                                    labelPlacement='top'
+                                    label="Play Audio Alarm"
+                                    control={
+                                        <Switch 
+                                            checked={settings.playAlarmAudio.value === 1}  
+                                            onChange={event => settings.playAlarmAudio.save(event.target.checked ? 1 : 0)}
+                                        />
+                                    }>
+                                </FormControlLabel>
+
+                                <FormControlLabel 
+                                    labelPlacement='top'
+                                    label={
+                                        <span className="flex flex-row items-center">
+                                            Notification Type
+                                        </span>
+                                    }
+                                    control={
+                                        <Select
+                                            value={settings.notificationStyle.value}
+                                            onChange={(event) => {
+                                                setNotificationStyle(event.target.value);
+                                            }}
+                                        >
+                                            {
+                                                notificationStyles.map(style => 
+                                                    <MenuItem value={style.value}>
+                                                        {style.name}
+                                                    </MenuItem>
+                                                )
+                                            }
+                                        </Select>
+                                    }>
+                                </FormControlLabel>
+
+                                <FormControlLabel 
+                                    labelPlacement='top'
+                                    label={
+                                        <Tooltip  
+                                            placement='right'
+                                            title={
+                                                <div className="text-base text-center">
+                                                    <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the "network delay" setting.</span>
+                                                </div>
+                                            }>
+                                            <span className="flex flex-row items-center">
+                                                Network Delay (milliseconds)
+                                                &nbsp;
+                                                <InfoIcon color='info'></InfoIcon>
+                                            </span>
+                                        </Tooltip>
+                                    }
+                                    control={
+
+                                        <NumberInput 
+                                            value={settings.networkDelay.value}
+                                            onValueChange={(val) => {
+                                                if (val) {
+                                                    settings.networkDelay.save(val);
+                                                }
+                                            }}
+                                            >
+
+                                        </NumberInput>
+                                    }>
+                                </FormControlLabel>
+                                
                             </FormGroup>
                 }
                 </DialogContent>

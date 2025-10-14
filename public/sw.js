@@ -118,7 +118,7 @@ function clearBlurStamp(database) {
             notificationPromise.then(async (eventData) => {
 
                 // Notify
-                self.registration.showNotification('test');
+                //await self.registration.showNotification('test');
                 
                 const database = await openDatabase();
                 await clearBlurStamp(database);
@@ -130,7 +130,7 @@ function clearBlurStamp(database) {
                         isComplete: eventData.payload.willComplete
                     }
                 }
-                event.source?.postMessage(completeNotificationPayload)
+                event.source?.postMessage(completeNotificationPayload);
                 
                 /*
                 self.registration.showNotification("Vibration Sample", {
