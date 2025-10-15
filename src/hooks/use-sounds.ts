@@ -1,5 +1,5 @@
 import { useSettings } from "@/hooks/use-settings";
-import { isAudioPlaying } from "@/util/isAudioPlaying";
+import { playAudioOnce } from "@/util/audio";
 import { useCallback, useMemo } from "react";
 
 export const useSounds = (
@@ -21,11 +21,11 @@ export const useSounds = (
         if (!craftStartAudio)
             return;
 
-        if (type === "work-complete" && !isAudioPlaying(craftStartAudio)) {
+        if (type === "work-complete") {
             //Intentional, it sounds better.
-            craftStartAudio.play();
-        } else if (type === "stamina-complete" && !isAudioPlaying(outOfStaminaAudio)) {
-            completeCraftAudio.play();
+            playAudioOnce(craftStartAudio);
+        } else if (type === "stamina-complete") {
+            playAudioOnce(completeCraftAudio);
         }
 
     }, [playAlarmAudio.value])

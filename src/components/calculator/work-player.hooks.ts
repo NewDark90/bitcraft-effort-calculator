@@ -10,7 +10,7 @@ import { useServiceWorker } from "@/hooks/use-service-worker";
 import { useSettings } from "@/hooks/use-settings";
 import { useSounds } from "@/hooks/use-sounds";
 import { useWakeLock } from "@/hooks/use-wake-lock";
-import { isAudioPlaying } from "@/util/isAudioPlaying";
+import { isAudioPlaying } from "@/util/audio";
 import { minmax } from "@/util/minmax";
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEventListener, useInterval, useLocalStorage } from "usehooks-ts";
