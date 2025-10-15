@@ -28,13 +28,13 @@ export const useNotificationSettings = (
     const [notificationPermission, _setNotificationPermission] = useState(Notification.permission);
 
     const setNotificationStyle = async (style: NotificationStyle) => {
-        if (style === "always" || style === "when-away") {
+        if (style === "when-away") {
             const newPermission = await Notification.requestPermission();
             _setNotificationPermission(newPermission);
         }
         await notificationStyle.save(style);
     }
-
+    
     return {
         notificationStyle: notificationStyle.value,
         notificationPermission,

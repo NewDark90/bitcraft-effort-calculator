@@ -5,8 +5,10 @@ import { TierNumber } from "@/config/tier";
 import { getWorkInterval, WorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
+import { useNotificationSettings } from "@/hooks/use-notification-settings";
 import { useServiceWorker } from "@/hooks/use-service-worker";
 import { useSettings } from "@/hooks/use-settings";
+import { useSounds } from "@/hooks/use-sounds";
 import { useWakeLock } from "@/hooks/use-wake-lock";
 import { isAudioPlaying } from "@/util/isAudioPlaying";
 import { minmax } from "@/util/minmax";
@@ -36,7 +38,6 @@ export type UseWorkPlayerStateReturn = {
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
     doStaminaRegen: (ratio?: number) => void; 
-    tryPlayAudio: (type: "work-complete" | "stamina-complete") => void;
 };
 
 
@@ -123,12 +124,11 @@ export const useWorkPlayerState = (
     const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tierId);
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
-
-    const {
-        settings: {
-            playAlarmAudio
-        }
-     } = useSettings();
+    const { tryPlayAudio } = useSounds();
+    const { 
+        notificationStyle,
+        notificationPermission
+    } = useNotificationSettings();
 
     const workInterval = getWorkInterval(craftingType, [armor, food]);
     const staminaCost = getStaminaCost(craftingType, craftingTier);
@@ -142,9 +142,9 @@ export const useWorkPlayerState = (
 
     const setFullEffort = useCallback((effort: number) => {
         const newEffort = Math.max(effort, 0);
-        _setCurrentEffort(0);
+        _setCurrentEffort(minmax(currentEffort, 0, newEffort));
         _setFullEffort(newEffort);
-    }, []);
+    }, [currentEffort]);
 
     const restart = useCallback(() => {
         _setIsWorking(false);
@@ -157,17 +157,6 @@ export const useWorkPlayerState = (
         _setCurrentStamina(newStamina); 
         return newStamina;
     }
-
-    const completeAudio = useMemo(() => new Audio('/sounds/complete.mp3'), []);
-    const tryPlayAudio = useCallback((type: "work-complete" | "stamina-complete") => {
-
-        if (type === "work-complete" && playAlarmAudio.value && !isAudioPlaying(completeAudio)) {
-            completeAudio.play();
-        } else if (type === "stamina-complete" && playAlarmAudio.value && !isAudioPlaying(completeAudio)) {
-            completeAudio.play();
-        }
-
-    }, [playAlarmAudio.value])
 
     const doWork = (ratio: number = 1) => {
         const newStamina = currentStamina - (staminaCost * ratio);
@@ -302,8 +291,7 @@ export const useWorkPlayerState = (
         setCurrentStamina: _setCurrentStamina,
         doWork, 
         doWorkBatch,
-        doStaminaRegen,
-        tryPlayAudio
+        doStaminaRegen
     };
 
     return result;
@@ -322,7 +310,6 @@ export const useWorkPlayerInteractivity = (
         currentStamina,
         setCurrentStamina,
         fullStamina,
-        tryPlayAudio,
         setIsWorking,
     }: UseWorkPlayerInteractivityParameters
 ) => {
@@ -336,6 +323,8 @@ export const useWorkPlayerInteractivity = (
             networkDelay
         }
      } = useSettings();
+     
+    const { tryPlayAudio } = useSounds();
 
     const onServiceWorkerMessage = (message: ServiceWorkerMessage) => {
         const messageResponse = message as unknown as ServiceWorkerMessageEventResponse;

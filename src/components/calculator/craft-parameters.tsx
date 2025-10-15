@@ -47,7 +47,7 @@ export default function CraftParameters(
     const id = React.useId();
 
     return (
-        <div className={clsx("flex flex-wrap items-end justify-center my-2", className)}>
+        <div className={clsx("flex flex-wrap items-end justify-center my-2 [&>*]:my-2", className)}>
             
             <div className="flex justify-center items-end">
                 <NumberInput 

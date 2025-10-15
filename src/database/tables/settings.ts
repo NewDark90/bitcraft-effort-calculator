@@ -10,7 +10,7 @@ export interface SettingEntity<
 }
 
 export const notificationStyles = [
-    { name: "Always", value: "always" },
+    //{ name: "Always", value: "always" },
     { name: "When Away", value: "when-away" },
     { name: "Never", value: "never" },
 ] as const

@@ -13,6 +13,7 @@ import { CraftingTypeSlug } from "@/config/crafting-types";
 import { useEffect } from "react";
 import StaminaStatistics from "@/components/calculator/stamina-statistics";
 import ProjectStatistics from "@/components/calculator/project-statistics";
+import clsx from "clsx";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
@@ -47,7 +48,9 @@ export default function WorkPlayer(
 
     useEffect(() => {
         onCraftingTypeChange?.(craftingType);
-    }, [craftingType])
+    }, [craftingType]);
+
+    const isEffortDone = currentEffort === fullEffort;
 
     return (
         <div className="w-full">
@@ -78,36 +81,40 @@ export default function WorkPlayer(
                 <div 
                     className="w-full flex flex-row justify-between sm:justify-center align-center my-2 grow"
                     >
-                    <div className="hidden sm:block grow w-[64px]"></div>
-                    <Button 
-                        variant="text"
-                        className="mx-2 p-2 md:px-8 md:py-3"
-                        onClick={() => doWork(-1)}
-                    >
-                        <UndoIcon color="info" fontSize="large"></UndoIcon>
-                    </Button>
-                    <Button 
-                        className="mx-2 p-2 md:px-8 md:py-3"
-                        variant="text"
-                        onClick={() => setIsWorking(!isWorking)}
-                    >
-                        {
-                            isWorking 
-                                ? <PauseIcon color="info" sx={{ fontSize: 96 }}></PauseIcon>
-                                : <PlayArrowIcon color="info" sx={{ fontSize: 96 }}></PlayArrowIcon>
-                        }
-                    </Button>
-                    <Button 
-                        variant="text"
-                        className="mx-2 p-2 md:px-8 md:py-3"
-                        onClick={() => doWork(1)}
-                    >
-                        <RedoIcon color="info" fontSize="large"></RedoIcon>
-                    </Button>
+                    { 
+                        !isEffortDone && <>
+                            <div className="hidden sm:block grow w-[64px]"></div>
+                            <Button 
+                                variant="text"
+                                className="mx-2 p-2 md:px-8 md:py-3"
+                                onClick={() => doWork(-1)}
+                            >
+                                <UndoIcon color="info" fontSize="large"></UndoIcon>
+                            </Button>
+                            <Button 
+                                className="mx-2 p-2 md:px-8 md:py-3"
+                                variant="text"
+                                onClick={() => setIsWorking(!isWorking)}
+                            >
+                                {
+                                    isWorking 
+                                        ? <PauseIcon color="info" sx={{ fontSize: 96 }}></PauseIcon>
+                                        : <PlayArrowIcon color="info" sx={{ fontSize: 96 }}></PlayArrowIcon>
+                                }
+                            </Button>
+                            <Button 
+                                variant="text"
+                                className="mx-2 p-2 md:px-8 md:py-3"
+                                onClick={() => doWork(1)}
+                            >
+                                <RedoIcon color="info" fontSize="large"></RedoIcon>
+                            </Button>
+                        </> 
+                    }
                     
-                    <div className="sm:grow w-[64px] flex align-center justify-end">
+                    <div className={clsx("sm:grow w-[64px] flex align-center", isEffortDone ? "grow" : "justify-end")}>
                         <Button 
-                            className="mx-2"
+                            className={isEffortDone ? "mx-auto" : "mx-2"}
                             variant="text"
                             onClick={restart}
                         >

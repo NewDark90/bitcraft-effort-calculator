@@ -31,7 +31,7 @@ export default function ProjectStatistics({
     const theme = useTheme();
 
     return (
-        <div className="flex flex-row flex-wrap justify-evenly items-baseline">
+        <div className="flex flex-row flex-wrap justify-evenly items-baseline [&>*]:my-1">
             <StatisticItem<string>
                 prefix={<AccessTimeIcon className='mx-1'></AccessTimeIcon>}
                 tooltipContent={
