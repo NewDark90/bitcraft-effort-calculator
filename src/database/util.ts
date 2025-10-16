@@ -13,7 +13,7 @@ export function slugify(str: string) {
     return str?.toLocaleLowerCase()?.replace(/\s/g, "_");
 }
 
-export async function deselectAllEntities<TEntity extends {selected: 0|1}>(table: EntityTable<TEntity>, rows?: TEntity[]) {
+export async function deselectAllEntities<TEntity extends {selected: 0|1}, TProp extends keyof TEntity>(table: EntityTable<TEntity, TProp>, rows?: TEntity[]) {
 
     const allSelected = rows ?? await table.where({selected: 1}).toArray();
     for (const selected of allSelected) {
@@ -23,7 +23,7 @@ export async function deselectAllEntities<TEntity extends {selected: 0|1}>(table
     await table.bulkPut(allSelected);
 }
 
-export async function selectEntity<TEntity extends {selected: 0|1}>(table: EntityTable<TEntity>, entity: TEntity) {
+export async function selectEntity<TEntity extends {selected: 0|1}, TProp extends keyof TEntity>(table: EntityTable<TEntity, TProp>, entity: TEntity) {
     const allSelected =  await table.where({selected: 1}).toArray();
     for (const selected of allSelected) {
         selected.selected = 0;
