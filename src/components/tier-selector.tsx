@@ -1,5 +1,3 @@
-import Image from "next/image";
-import SquareIcon from '@mui/icons-material/Square';
 import { TierNumber } from "@/config/tier";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useId } from "react";

@@ -1,11 +1,6 @@
-import Image from "next/image";
-import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import NumberInput from "@/components/common/number-input";
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tooltip } from "@mui/material";
-import { useState } from "react";
-import { CraftingTier, craftingTierMap, craftingTiers } from "@/config/crafting-tiers";
+import { FormControl, InputLabel, MenuItem, Select, Tooltip } from "@mui/material";
 import React from "react";
-import SquareIcon from '@mui/icons-material/Square';
 import clsx from "clsx";
 import { TierNumber } from "@/config/tier";
 import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
@@ -129,7 +124,7 @@ export default function CraftParameters(
 
             <Tooltip title={
                 <div className="text-base text-center">
-                    <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the "network delay" setting.</span>
+                    <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the &quot;network delay&quot; setting.</span>
                 </div>
             }>
                 <div className="flex flex-row flex-wrap item-center justify-center text-center self-center">

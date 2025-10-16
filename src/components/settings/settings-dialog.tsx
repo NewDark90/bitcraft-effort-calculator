@@ -10,16 +10,11 @@ import {
     IconButton, 
     DialogTitle,
     CircularProgress,
-    DialogContent,
-    Tooltip,
-    Select,
-    MenuItem
+    DialogContent
 } from '@mui/material';
 import { useSettings } from '@/hooks/use-settings';
 import NumberInput from '@/components/common/number-input';
 import InfoIcon from '@mui/icons-material/Info';
-import { notificationStyles } from '@/database';
-import { useNotificationSettings } from '@/hooks/use-notification-settings';
 
 const labelWrapper = (title: React.ReactNode, tooltip?: React.ReactNode) => {
     return (
@@ -58,10 +53,6 @@ export default function SettingsDialog(
         isLoadingSettings,
         settings
     } = useSettings();
-
-    const {
-        setNotificationStyle
-    } = useNotificationSettings();
 
     return (
         <>

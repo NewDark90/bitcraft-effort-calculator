@@ -16,7 +16,6 @@ export default function FoodSelectButton(
 ) {
 
     const theme = useTheme();
-    const iconSize = 32;
 
     return (
         <ButtonLink

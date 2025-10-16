@@ -5,7 +5,7 @@ export function tryParseJson<T>(jsonString: string | null, defaultValue: T): T {
     try {
         const parsed = JSON.parse(jsonString);
         return parsed as T;
-    } catch (e) {
+    } catch {
         return defaultValue;
     }
 }

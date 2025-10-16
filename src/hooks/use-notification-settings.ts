@@ -14,18 +14,17 @@ export const useNotificationSettings = (
 ): UseNotificationSettingsReturn => {
 
     // Not supported by the browser
+    const fauxSetNotificationStyle = useCallback(() => Promise.resolve(), []);
+    const { settings: { notificationStyle } } = useSettings();
+    const [notificationPermission, _setNotificationPermission] = useState(Notification.permission);
+
     if (typeof window === "undefined" || !("Notification" in window)) {
-        const fauxSetNotificationStyle = useCallback((style: string) => Promise.resolve(), []);
         return {
             notificationStyle: "never",
             notificationPermission: "denied",
             setNotificationStyle: fauxSetNotificationStyle
         }
     }
-
-    const { settings: { notificationStyle } } = useSettings();
-
-    const [notificationPermission, _setNotificationPermission] = useState(Notification.permission);
 
     const setNotificationStyle = async (style: NotificationStyle) => {
         if (style === "when-away") {
@@ -34,7 +33,7 @@ export const useNotificationSettings = (
         }
         await notificationStyle.save(style);
     }
-    
+
     return {
         notificationStyle: notificationStyle.value,
         notificationPermission,

@@ -1,5 +1,6 @@
 
-declare interface ServiceWorkerMessage<TType extends string = string, TPayload = any> {
+
+declare interface ServiceWorkerMessage<TType extends string = string, TPayload = unknown> {
     type: TType;
     payload: TPayload;
     id?: string; // Optional message ID for request-response tracking

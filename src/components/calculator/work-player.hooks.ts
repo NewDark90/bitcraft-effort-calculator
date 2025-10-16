@@ -5,14 +5,13 @@ import { TierNumber } from "@/config/tier";
 import { getWorkInterval, WorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
-import { useNotificationSettings } from "@/hooks/use-notification-settings";
+import { useEffectChange } from "@/hooks/use-effect-change";
 import { useServiceWorker } from "@/hooks/use-service-worker";
 import { useSettings } from "@/hooks/use-settings";
 import { useSounds } from "@/hooks/use-sounds";
 import { useWakeLock } from "@/hooks/use-wake-lock";
-import { isAudioPlaying } from "@/util/audio";
 import { minmax } from "@/util/minmax";
-import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useEventListener, useInterval, useLocalStorage } from "usehooks-ts";
 
 
@@ -125,32 +124,28 @@ export const useWorkPlayerState = (
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
     const { tryPlayAudio } = useSounds();
-    const { 
-        notificationStyle,
-        notificationPermission
-    } = useNotificationSettings();
 
     const workInterval = getWorkInterval(craftingType, [armor, food]);
     const staminaCost = getStaminaCost(craftingType, craftingTier);
     const staminaRegenRate = flatStaminaRegenRate + (food?.staminaRegen ?? 0);
 
-    const setCurrentEffort = useCallback((effort: number) => {
+    const setCurrentEffort = (effort: number) => {
         const newEffort = minmax(effort, 0, fullEffort);
         _setCurrentEffort(newEffort);
         return newEffort;
-    }, [fullEffort])
+    };
 
-    const setFullEffort = useCallback((effort: number) => {
+    const setFullEffort = (effort: number) => {
         const newEffort = Math.max(effort, 0);
         _setCurrentEffort(minmax(currentEffort, 0, newEffort));
         _setFullEffort(newEffort);
-    }, [currentEffort]);
+    };
 
-    const restart = useCallback(() => {
+    const restart = () => {
         _setIsWorking(false);
         _setCurrentEffort(0);
         _setCurrentStamina(armor.stamina);
-    }, []);
+    };
 
     const doStaminaRegen = (ratio: number = 1) => {
         const newStamina =  minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
@@ -223,7 +218,7 @@ export const useWorkPlayerState = (
         const remainingEffort = staminaIterations * skill.power;
         const fullWorkTimeMs = totalStaminaBarIterations * workInterval.effectiveMs;
 
-        const staminaAfterWorkIterations = currentStamina - (staminaIterations * staminaCost);
+        //const staminaAfterWorkIterations = currentStamina - (staminaIterations * staminaCost);
         const timeToRegenerateStaminaMs = ((armor.stamina - currentStamina) / staminaRegenRate) * 1000;
         const fullTimeToRegenerateStaminaMs = (armor.stamina / staminaRegenRate) * 1000;
 
@@ -307,7 +302,6 @@ export const useWorkPlayerInteractivity = (
         doStaminaRegen,
         doWorkBatch,
         workProgressStats,
-        currentStamina,
         setCurrentStamina,
         fullStamina,
         setIsWorking,
@@ -316,6 +310,7 @@ export const useWorkPlayerInteractivity = (
 
     const documentRef = useRef(document);
     const [isFocused, setIsFocused] = useState(true);
+    const [previousFullStamina, setPreviousFullStamina] = useState(fullStamina);
     //const [blurredStamp, _setBlurredStamp] = useLocalStorage<null|number>('work-player.blurred-stamp', null);
     const { wakeLock, wakeRelease } = useWakeLock();
     const {
@@ -345,17 +340,17 @@ export const useWorkPlayerInteractivity = (
         if (serviceWorker.isSupported) {
             serviceWorker.register();
         }
-    }, []);
+    });
 
-    // If the pool amount of stamina changes, make sure the current isn't out of bounds.
-    useEffect(() => {
+    if (previousFullStamina != fullStamina) {
+        setPreviousFullStamina(fullStamina);
         setCurrentStamina(fullStamina);
         setIsWorking(false);
-    }, [fullStamina]);
+    }
 
     useEventListener(
         "blur", 
-        async (event) => {
+        async (_event) => {
             if (isWorking) {
                 await calculatorDatabase.settings.put({
                     id: settingKeys.calculatorBlurStamp,
@@ -384,7 +379,7 @@ export const useWorkPlayerInteractivity = (
 
     useEventListener(
         "focus", 
-        async (event) => {
+        async (_event) => {
             
             if (isWorking) {
                 // In this case, we've lost focus, and regained it before the service worker recognizes it being done. 
@@ -427,7 +422,7 @@ export const useWorkPlayerInteractivity = (
         !isWorking && isFocused ? 1000 + networkDelay.value : null
     )
 
-    useEffect(() => {
+    useEffectChange(() => {
         if (isWorking) {
             wakeLock();
         } else {

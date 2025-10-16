@@ -28,10 +28,11 @@ export default function Skill(
     const updateSelectedSkill = async (skill: SkillEntity | undefined) => {
         if (skill) {
             await skillService.setSelectedSkill(skill);
+            onSelectedSkillChange?.(skill);
         }
     }
 
-    let wrapperClass = `flex flex-col text-center items-center ${className}`;
+    const wrapperClass = `flex flex-col text-center items-center ${className}`;
     const selectedClass = `text-green-500`;
 
     return (

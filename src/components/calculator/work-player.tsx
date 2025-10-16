@@ -4,7 +4,6 @@ import { Button } from "@mui/material";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import WorkStatistics from "@/components/calculator/work-statistics";
 import { useWorkPlayerInteractivity, useWorkPlayerState } from "@/components/calculator/work-player.hooks";
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
@@ -32,7 +31,7 @@ export default function WorkPlayer(
 ) {
 
     const workPlayerState = useWorkPlayerState(armor, skill, food);
-    const workPlayerInterativity = useWorkPlayerInteractivity(workPlayerState);
+    useWorkPlayerInteractivity(workPlayerState);
 
     const {
         fullEffort, setFullEffort,
@@ -48,7 +47,7 @@ export default function WorkPlayer(
 
     useEffect(() => {
         onCraftingTypeChange?.(craftingType);
-    }, [craftingType]);
+    }, [craftingType, onCraftingTypeChange]);
 
     const isEffortDone = currentEffort === fullEffort;
 
@@ -144,16 +143,6 @@ export default function WorkPlayer(
             </ProgressBar>
             
             <ProjectStatistics projectStats={workProgressStats.projectStats}></ProjectStatistics>
-
-            <WorkStatistics 
-                skill={ skill } 
-                armor={ armor } 
-                craftingType={ craftingType } 
-                fullEffort={ fullEffort } 
-                currentEffort={ currentEffort } 
-                currentStamina={ currentStamina }
-            >
-            </WorkStatistics>
         </div>
     );
 }

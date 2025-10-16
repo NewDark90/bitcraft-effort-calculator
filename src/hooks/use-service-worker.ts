@@ -49,7 +49,7 @@ export const useServiceWorker = (options: UseServiceWorkerOptions = {}) => {
 
     
     // Register service worker
-    const register = useCallback(async () => {
+    const register = async () => {
         if (!isSupported || registration) 
             return;
 
@@ -62,7 +62,7 @@ export const useServiceWorker = (options: UseServiceWorkerOptions = {}) => {
             setError(err);
             onError?.(err);
         }
-    }, [isSupported, serviceWorkerUrl, onError]);
+    };
 
     // Unregister service worker
     const unregister = useCallback(async () => {

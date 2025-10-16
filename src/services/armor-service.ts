@@ -1,6 +1,5 @@
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity } from "@/database/tables";
-import { tryParseJson } from "@/util/tryParseJson";
 import { InsertType } from "dexie";
 
 export class ArmorService {

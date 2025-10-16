@@ -1,6 +1,4 @@
-
-import humanizeDuration from 'humanize-duration';
-import { styled, Theme, Tooltip, tooltipClasses, TooltipProps, useTheme } from "@mui/material";
+import { styled, Tooltip, tooltipClasses, TooltipProps, useTheme } from "@mui/material";
 import React from 'react';
 
 export type StatisticItemProps<TValue extends React.ReactNode = React.ReactNode> = {

@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material";
 import { WorkProgressStats } from "@/components/calculator/work-player.hooks";
 import StatisticItem from '@/components/calculator/statistic-item';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -25,8 +24,6 @@ export default function StaminaStatistics({
         staminaRegen
     }
 }: StaminaStatisticsProps) {
-
-    const theme = useTheme();
 
     return (
         <div className="flex flex-row flex-wrap justify-evenly items-baseline [&>*]:my-1">

@@ -1,6 +1,6 @@
 import { useSettings } from "@/hooks/use-settings";
 import { playAudioOnce } from "@/util/audio";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 export const useSounds = (
     
@@ -13,22 +13,23 @@ export const useSounds = (
      } = useSettings();
 
 
-    const outOfStaminaAudio = useMemo(() => new Audio('/sounds/out-of-stamina.mp3'), []);
-    const craftStartAudio = useMemo(() => new Audio('/sounds/craft-start.mp3'), []);
-    const completeCraftAudio = useMemo(() => new Audio('/sounds/complete-craft.mp3'), []);
+    //const outOfStaminaAudio = useMemo(() => new Audio('/sounds/out-of-stamina.mp3'), []);
+    //const craftStartAudio = useMemo(() => new Audio('/sounds/craft-start.mp3'), []);
+    //const completeCraftAudio = useMemo(() => new Audio('/sounds/complete-craft.mp3'), []);
 
-    const tryPlayAudio = useCallback((type: "work-complete" | "stamina-complete") => {
-        if (!craftStartAudio)
+    const memeAlarm = useMemo(() => new Audio('/sounds/meme.mp3'), []);
+
+    const tryPlayAudio = (type: "work-complete" | "stamina-complete") => {
+        if (!playAlarmAudio.value)
             return;
 
         if (type === "work-complete") {
-            //Intentional, it sounds better.
-            playAudioOnce(craftStartAudio);
+            playAudioOnce(memeAlarm);
         } else if (type === "stamina-complete") {
-            playAudioOnce(completeCraftAudio);
+            playAudioOnce(memeAlarm);
         }
 
-    }, [playAlarmAudio.value])
+    };
 
     return {
         tryPlayAudio

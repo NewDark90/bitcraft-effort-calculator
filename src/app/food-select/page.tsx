@@ -2,15 +2,16 @@
 
 import { NoSSR } from 'next-dynamic-no-ssr';
 import { useLiveQuery } from "dexie-react-hooks";
-import { calculatorDatabase, deselectAllEntities, FoodEntity, FoodType, foodTypes, selectEntity } from "@/database";
+import { calculatorDatabase, deselectAllEntities, FoodType, foodTypes, selectEntity } from "@/database";
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { useEffect, useId, useState } from "react";
-import { TierNumber, tiers } from "@/config/tier";
+import { useId, useState } from "react";
+import { TierNumber } from "@/config/tier";
 import TierSelector from "@/components/tier-selector";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import clsx from "clsx";
 import CalculatorNavLink from "@/components/calculator-nav-link";
+import { useEffectChange } from '@/hooks/use-effect-change';
 
 export default function FoodSelect() {
 
@@ -21,8 +22,8 @@ export default function FoodSelect() {
 
     const [selectedType, setSelectedType] = useState<FoodType|"">("");
     const [selectedTier, setSelectedTier] = useState<TierNumber|"">("");
-
-    useEffect(() => {
+    
+    useEffectChange(() => {
         setSelectedType(selectedFood?.type ?? "");
         setSelectedTier(selectedFood?.tier ?? "");
     }, [foods != null]);

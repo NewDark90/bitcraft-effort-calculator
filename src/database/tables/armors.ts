@@ -10,7 +10,7 @@ export interface ArmorEntity {
     buildBonus: number;
 }
 
-export const armorColumns = (
+export const armorColumns: string[] = (
     [
         'id',
         'name',
@@ -21,7 +21,7 @@ export const armorColumns = (
         'buildBonus'
     ] satisfies Array<keyof ArmorEntity>
 );
-armorColumns[0] = `++${armorColumns[0]}` as any; //autoincrement definition
+armorColumns[0] = `++${armorColumns[0]}`; //autoincrement definition
 
 
 export const initializeArmor = async (db: BitcraftCalculatorDatabase) => {

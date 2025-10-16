@@ -1,6 +1,5 @@
 import clsx from "clsx";
-import Link, { LinkProps } from "next/link";
-import { ReactNode } from "react";
+import Link from "next/link";
 
 export type ButtonLinkProps = Parameters<typeof Link>[0];
 

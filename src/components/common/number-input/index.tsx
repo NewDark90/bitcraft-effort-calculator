@@ -25,7 +25,6 @@ export default function NumberInput(
         className, 
         label, 
         displayStepValue, 
-        onInput, 
         ...props 
     }: NumberInputProps
 ) {

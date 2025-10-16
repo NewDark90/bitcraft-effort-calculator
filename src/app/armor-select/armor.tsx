@@ -7,8 +7,6 @@ import { ArmorEntity } from "@/database/tables";
 import { Button, TextField } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import SkillIcon from "@/components/skill-icon";
-import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 
 export type ArmorProps = { 
@@ -22,7 +20,7 @@ export type ArmorProps = {
 export default function Armor(
     { armor, className, onArmorChange, onArmorSelect, onArmorDelete }: ArmorProps
 ) {
-    let wrapperClass = `flex flex-row text-center items-center w-full [&>*]:mx-2 ${className}`;
+    const wrapperClass = `flex flex-row text-center items-center w-full [&>*]:mx-2 ${className}`;
     const selectedClass = `text-green-500`;
 
     return (

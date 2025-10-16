@@ -1,9 +1,7 @@
 
-import { Theme, useTheme } from "@mui/material";
 import { WorkProgressStats } from "@/components/calculator/work-player.hooks";
 import StatisticItem from '@/components/calculator/statistic-item';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import SkillIcon from '@/components/skill-icon';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import HexagonIcon from '@mui/icons-material/Hexagon';
@@ -27,8 +25,6 @@ export default function ProjectStatistics({
         staminaRegen
     }
 }: ProjectStatisticsProps) {
-
-    const theme = useTheme();
 
     return (
         <div className="flex flex-row flex-wrap justify-evenly items-baseline [&>*]:my-1">

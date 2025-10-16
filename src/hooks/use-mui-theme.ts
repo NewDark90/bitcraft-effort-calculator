@@ -1,5 +1,6 @@
 import { createTheme, useMediaQuery } from "@mui/material";
 
+/*
 const cssVar = (varName: string): string => {
     // This only works in browser environment
     if (typeof window === 'undefined') 
@@ -10,8 +11,9 @@ const cssVar = (varName: string): string => {
         .trim();
     return cssValue;
 };
+*/
 
-export const buildMuiTheme = () => {
+export const useMuiTheme = () => {
     const theme = useMediaQuery('(prefers-color-scheme: dark)') ? "dark" : "light";
 
     return createTheme({

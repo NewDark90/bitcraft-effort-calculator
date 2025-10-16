@@ -1,11 +1,10 @@
 'use client'
 
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { buildMuiTheme } from "@/app/mui-theme";
+import { useMuiTheme } from "@/hooks/use-mui-theme";
 import SettingsDialog from "@/components/settings/settings-dialog";
 
 const geistSans = Geist({
@@ -30,7 +29,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const theme = buildMuiTheme();
+    const theme = useMuiTheme();
 
     return (
         <html lang="en">

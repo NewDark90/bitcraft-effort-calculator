@@ -1,11 +1,10 @@
 import Link from "next/link";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
-export type CalculatorNavLinkProps = { 
-};
+//export type CalculatorNavLinkProps = { };
 
 export default function CalculatorNavLink(
-    { }: CalculatorNavLinkProps
+    //{ }: CalculatorNavLinkProps
 ) {
 
     return (
