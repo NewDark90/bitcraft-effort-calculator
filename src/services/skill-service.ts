@@ -53,7 +53,6 @@ export class SkillService {
         
         await calculatorDatabase.skills.bulkPut([...selectedSkills, skill]);
     }
-    
 }
 
 export const skillService = new SkillService();
