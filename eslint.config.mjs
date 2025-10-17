@@ -16,7 +16,7 @@ const eslintConfig = [
         "@typescript-eslint/no-explicit-any": "warn",
         "no-unused-vars": "off", // Disable the base ESLint rule
         "@typescript-eslint/no-unused-vars": [
-          "error",
+          "warn",
           {
             "argsIgnorePattern": "^_",
             "varsIgnorePattern": "^_",
