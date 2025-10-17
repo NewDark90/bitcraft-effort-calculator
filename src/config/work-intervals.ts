@@ -19,6 +19,15 @@ export const craftingTypeWorkIntervals = new Map<CraftingTypeSlug, number>([
     ["build",   2],
 ]) as ReadonlyMap<CraftingTypeSlug, number>;
 
+export function getWorkIntervalFromSeconds(seconds: number): WorkInterval  {
+    return {
+        base: seconds,
+        baseMs: seconds * 1000,
+        effective: seconds,
+        effectiveMs: seconds * 1000
+    };
+}
+
 export function getWorkInterval<TBonus extends CraftBonusEntity>(
     craftTypeSlug: CraftingTypeSlug, 
     bonuses?: Array<TBonus|undefined>

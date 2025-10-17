@@ -1,5 +1,5 @@
 import NumberInput from "@/components/common/number-input";
-import { FormControl, InputLabel, MenuItem, Select, Tooltip } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select, Tooltip } from "@mui/material";
 import React from "react";
 import clsx from "clsx";
 import { TierNumber } from "@/config/tier";
@@ -7,6 +7,10 @@ import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
 import TierSelector from "@/components/tier-selector";
 import SkillIcon from "@/components/skill-icon";
 import { WorkInterval } from "@/config/work-intervals";
+import { useLocalStorage } from "usehooks-ts";
+import CalculateIcon from '@mui/icons-material/Calculate';
+import EditIcon from '@mui/icons-material/Edit';
+
 
 export type CraftParametersProps = { 
     fullEffort: number;
@@ -14,6 +18,7 @@ export type CraftParametersProps = {
     craftType: CraftingTypeSlug;
     craftingTier: TierNumber;
     workInterval: WorkInterval;
+    isIntervalOverride: boolean;
     isWorking: boolean;
 
     className?: string;
@@ -22,6 +27,8 @@ export type CraftParametersProps = {
     onCurrentEffortChange: (effort: number) => void;
     onCraftTypeChange: (craftType: CraftingTypeSlug) => void;
     onCraftTierChange: (craftType: TierNumber) => void;
+    onIsIntervalOverrideChange: (isManual: boolean) => void;
+    onManualIntervalChange: (interval: number) => void;
 };
 
 export default function CraftParameters(
@@ -32,11 +39,16 @@ export default function CraftParameters(
         craftingTier,
         workInterval,
         isWorking,
+        isIntervalOverride,
+
         className,
+
         onCurrentEffortChange, 
         onFullEffortChange, 
         onCraftTypeChange,
-        onCraftTierChange
+        onCraftTierChange,
+        onIsIntervalOverrideChange,
+        onManualIntervalChange,
     }: CraftParametersProps
 ) {
     const id = React.useId();
@@ -122,24 +134,56 @@ export default function CraftParameters(
                 </TierSelector>
             } 
 
-            <Tooltip title={
-                <div className="text-base text-center">
-                    <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the &quot;network delay&quot; setting.</span>
+            <div className="flex flex-row flex-wrap item-center justify-center text-center self-center">
+                
+                <div className="w-full">
+                    <Tooltip placement="top"  title={
+                        <div className="text-base text-center">
+                            <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the &quot;network delay&quot; setting.</span>
+                        </div>
+                    }>
+                        <div>
+                            <SkillIcon
+                                folder="/other"
+                                name="interval"
+                                size={24}
+                                className="invert-0 dark:invert inline-block"
+                            ></SkillIcon>
+                            Interval
+                        </div>
+                    </Tooltip>
                 </div>
-            }>
-                <div className="flex flex-row flex-wrap item-center justify-center text-center self-center">
-                    <span className="w-full">Interval</span>
-                    <SkillIcon
-                        folder="/other"
-                        name="interval"
-                        size={24}
-                        className="invert-0 dark:invert inline-block"
-                    ></SkillIcon>
-                    <span className="m-2">{(workInterval.effective).toFixed(2)}</span>
-                </div>
-            </Tooltip>
 
-            
+                <Button
+                    className="min-w-[32px]"
+                    onClick={() => { onIsIntervalOverrideChange(!isIntervalOverride) }}>
+                        {
+                            isIntervalOverride 
+                                ? <CalculateIcon></CalculateIcon>
+                                : <EditIcon></EditIcon>
+                        }
+                </Button>
+                
+                <NumberInput 
+                    className="my-2"
+                    value={workInterval.effective} 
+                    readOnly={!isIntervalOverride}
+                    step={0}
+                    min={0.01}
+                    format={{
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                    }}
+                    onValueChange={(interval) => {
+                        if (!interval)
+                            return;
+
+                        onManualIntervalChange(interval);
+                    }}
+                >
+                </NumberInput>
+            </div>
+
         </div>
     );
 }

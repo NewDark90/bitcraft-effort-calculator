@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import StaminaStatistics from "@/components/calculator/stamina-statistics";
 import ProjectStatistics from "@/components/calculator/project-statistics";
 import clsx from "clsx";
+import { useEffectChange } from "@/hooks/use-effect-change";
 
 export type WorkPlayerProps = {   
     skill: SkillEntity;
@@ -39,15 +40,17 @@ export default function WorkPlayer(
         craftingType, setCraftingType,
         craftingTier, setCraftingTier,
         workInterval,
+        isIntervalOverride, setIsIntervalOverride,
+        setManualInterval,
         currentStamina, 
         workProgressStats,
         isWorking, setIsWorking,
         doWork, restart,
     } = workPlayerState;
 
-    useEffect(() => {
+    useEffectChange(() => {
         onCraftingTypeChange?.(craftingType);
-    }, [craftingType, onCraftingTypeChange]);
+    }, [craftingType]);
 
     const isEffortDone = currentEffort === fullEffort;
 
@@ -66,16 +69,21 @@ export default function WorkPlayer(
                     craftType={craftingType}
                     craftingTier={craftingTier}
                     workInterval={workInterval}
+                    isIntervalOverride={isIntervalOverride}
                     isWorking={isWorking}
 
                     onCraftTypeChange={(type) => { setCraftingType(type) }}
                     onCraftTierChange={(tier) => { setCraftingTier(tier) }}
                     onCurrentEffortChange={(effort) => { setCurrentEffort(effort); }}
                     onFullEffortChange={(effort) => { setFullEffort(effort); }}
+                    onIsIntervalOverrideChange={(isOverride) => { setIsIntervalOverride(isOverride) }}
+                    onManualIntervalChange={(interval) => {
+                        if (!isIntervalOverride) 
+                            return
+                        setManualInterval(interval);
+                    }}
                 >
                 </CraftParameters>
-
-                
 
                 <div 
                     className="w-full flex flex-row justify-between sm:justify-center align-center my-2 grow"

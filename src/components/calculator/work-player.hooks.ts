@@ -2,7 +2,7 @@ import { craftingTiers } from "@/config/crafting-tiers";
 import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
 import { getStaminaCost } from "@/config/stamina-costs";
 import { TierNumber } from "@/config/tier";
-import { getWorkInterval, WorkInterval } from "@/config/work-intervals";
+import { getWorkInterval, getWorkIntervalFromSeconds, WorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
 import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
 import { useEffectChange } from "@/hooks/use-effect-change";
@@ -24,6 +24,7 @@ export type UseWorkPlayerStateReturn = {
     craftingTier: TierNumber; 
     isWorking: boolean; 
     workInterval: WorkInterval;
+    isIntervalOverride: boolean;
     staminaCost: number;
     workProgressStats: WorkProgressStats;
 
@@ -34,6 +35,8 @@ export type UseWorkPlayerStateReturn = {
     setCurrentEffort: (effort: number) => number; 
     setFullEffort: (effort: number) => void; 
     setCurrentStamina: (stamina: number) => void; 
+    setIsIntervalOverride: Dispatch<SetStateAction<boolean>> 
+    setManualInterval: Dispatch<SetStateAction<number>> 
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
     doStaminaRegen: (ratio?: number) => void; 
@@ -123,9 +126,15 @@ export const useWorkPlayerState = (
     const [craftingTier, _setCraftingTier] = useLocalStorage('work-player.crafting-tier', craftingTiers[0].tierId);
     const [currentStamina, _setCurrentStamina] = useLocalStorage('work-player.current-stamina', armor.stamina);
     const [isWorking, _setIsWorking] = useLocalStorage('work-player.is-working', false);
+    const [isIntervalOverride, _setIsIntervalOverride] = useLocalStorage('work-player.is-interval-override', false);
+    const [manualInterval, _setManualInterval] = useLocalStorage('work-player.manual-interval', 1.6);
+
     const { tryPlayAudio } = useSounds();
 
-    const workInterval = getWorkInterval(craftingType, [armor, food]);
+    const workInterval: WorkInterval = isIntervalOverride 
+        ? getWorkIntervalFromSeconds(manualInterval)
+        : getWorkInterval(craftingType, [armor, food]);
+
     const staminaCost = getStaminaCost(craftingType, craftingTier);
     const staminaRegenRate = flatStaminaRegenRate + (food?.staminaRegen ?? 0);
 
@@ -274,8 +283,10 @@ export const useWorkPlayerState = (
         craftingTier,
         isWorking,
         workInterval,
+        isIntervalOverride: isIntervalOverride, 
         staminaCost,
         workProgressStats,
+
 
         restart,
         setIsWorking: _setIsWorking,
@@ -284,9 +295,11 @@ export const useWorkPlayerState = (
         setCurrentEffort,
         setFullEffort,
         setCurrentStamina: _setCurrentStamina,
+        setIsIntervalOverride: _setIsIntervalOverride,
+        setManualInterval: _setManualInterval,
         doWork, 
         doWorkBatch,
-        doStaminaRegen
+        doStaminaRegen,
     };
 
     return result;
