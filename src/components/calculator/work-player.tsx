@@ -9,7 +9,6 @@ import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import { ArmorEntity, FoodEntity, SkillEntity } from "@/database/tables";
 import { CraftingTypeSlug } from "@/config/crafting-types";
-import { useEffect } from "react";
 import StaminaStatistics from "@/components/calculator/stamina-statistics";
 import ProjectStatistics from "@/components/calculator/project-statistics";
 import clsx from "clsx";

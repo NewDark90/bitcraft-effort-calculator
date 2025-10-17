@@ -7,7 +7,6 @@ import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
 import TierSelector from "@/components/tier-selector";
 import SkillIcon from "@/components/skill-icon";
 import { WorkInterval } from "@/config/work-intervals";
-import { useLocalStorage } from "usehooks-ts";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import EditIcon from '@mui/icons-material/Edit';
 
