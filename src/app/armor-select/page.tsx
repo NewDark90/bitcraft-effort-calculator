@@ -24,6 +24,13 @@ export default function ArmorSelect() {
             <nav className="my-8">
                 <CalculatorNavLink></CalculatorNavLink>
             </nav>
+            <div className="my-4 text-center">
+                <p>
+                    The percentages for your armor should be in the 
+                    <span className="font-bold">&quot;Character&quot;</span> &rarr; <span className="font-bold">&quot;View Detailed Statistics&quot;</span> &rarr; <span className="font-bold">&quot;All Professions&quot;</span>.
+                </p>
+                <p>Do <span className="font-bold italic">not</span> use the numbers while a food buff is active.</p>
+            </div>
             <div className="flex gap-4 flex-wrap flex-col sm:flex-row">
                 {
                     armors?.map((armor, index) =>

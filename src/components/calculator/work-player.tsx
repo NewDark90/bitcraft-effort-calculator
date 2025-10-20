@@ -41,7 +41,9 @@ export default function WorkPlayer(
         workInterval,
         isIntervalOverride, setIsIntervalOverride,
         setManualInterval,
+        fullStamina,
         currentStamina, 
+        setCurrentStamina,
         workProgressStats,
         isWorking, setIsWorking,
         doWork, restart,
@@ -139,7 +141,10 @@ export default function WorkPlayer(
                 max={ armor?.stamina ?? 100 }>
             </ProgressBar>
 
-            <StaminaStatistics staminaStats={workProgressStats.staminaStats}></StaminaStatistics>
+            <StaminaStatistics 
+                staminaStats={workProgressStats.staminaStats} 
+                onStaminaFull={() => setCurrentStamina(fullStamina)}>
+            </StaminaStatistics>
 
             <ProgressBar key="effort" 
                 className="my-4"

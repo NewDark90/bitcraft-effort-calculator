@@ -135,8 +135,8 @@ export default function SettingsDialog(
                                     labelPlacement='top'
                                     label={
                                         labelWrapper(
-                                            "Network Delay (milliseconds)",
-                                            `Interval may not perfectly match the game speed due to network round trips. This setting forces a delay to match the actual game speed. If the timing is off, try changing the "network delay" setting. The larger the number, the slower the craft.`
+                                            "Craft Delay (milliseconds)",
+                                            `The calculator craft interval may go faster than the game. This setting forces a delay to the craft interval to help match the actual game crafting speed.`
                                         )
                                     }
                                     control={

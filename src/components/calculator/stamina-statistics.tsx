@@ -4,8 +4,11 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import SkillIcon from "@/components/skill-icon";
+import { Button } from "@mui/material";
 
-export type StaminaStatisticsProps = Pick<WorkProgressStats, 'staminaStats'>;
+export type StaminaStatisticsProps = Pick<WorkProgressStats, 'staminaStats'> & {
+    onStaminaFull: () => void;
+};
 
 const tooltipWrapper = (desc: React.ReactNode) => {
     return (
@@ -22,11 +25,12 @@ export default function StaminaStatistics({
         effort,
         workTime,
         staminaRegen
-    }
+    },
+    onStaminaFull
 }: StaminaStatisticsProps) {
 
     return (
-        <div className="flex flex-row flex-wrap justify-evenly items-baseline [&>*]:my-1">
+        <div className="flex flex-row flex-wrap justify-evenly items-center [&>*]:my-1">
             <StatisticItem<string>
                 prefix={<AccessTimeIcon className='mx-1'></AccessTimeIcon>}
                 tooltipContent={
@@ -66,7 +70,15 @@ export default function StaminaStatistics({
                 }
                 left={Math.ceil((staminaRegen.timeToFullMs) / 1000).toFixed(0)}
                 right={Math.ceil(staminaRegen.fullMs / 1000).toFixed(0)}
-                suffix={<span className='mx-1'>Seconds</span>}
+                suffix={
+                    <>
+                        <span className='mx-1'>Seconds</span>
+                        <Button onClick={onStaminaFull}>    
+                            <AutorenewIcon fontSize="small" htmlColor="var(--energy, yellow)"></AutorenewIcon>
+                            Full
+                        </Button>
+                    </>
+                }
             ></StatisticItem>
         </div>
     );

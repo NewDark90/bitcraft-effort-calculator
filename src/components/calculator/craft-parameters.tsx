@@ -148,20 +148,26 @@ export default function CraftParameters(
                                 size={24}
                                 className="invert-0 dark:invert inline-block"
                             ></SkillIcon>
-                            Interval
+                            Interval  
+                            <span className="text-xs mx-2">{isIntervalOverride ? "[Manual]" : "[Calculated]" }</span>
                         </div>
                     </Tooltip>
                 </div>
-
-                <Button
-                    className="min-w-[32px]"
-                    onClick={() => { onIsIntervalOverrideChange(!isIntervalOverride) }}>
-                        {
-                            isIntervalOverride 
-                                ? <CalculateIcon></CalculateIcon>
-                                : <EditIcon></EditIcon>
-                        }
-                </Button>
+                <Tooltip placement="top" title={
+                        <div className="text-base text-center">
+                            <span>Toggle: {isIntervalOverride ? "Calculated Mode" : "Edit Mode" } </span>
+                        </div>
+                    }>
+                    <Button
+                        className="min-w-[32px]"
+                        onClick={() => { onIsIntervalOverrideChange(!isIntervalOverride) }}>
+                            {
+                                isIntervalOverride 
+                                    ? <CalculateIcon></CalculateIcon>
+                                    : <EditIcon></EditIcon>
+                            }
+                    </Button>
+                </Tooltip>
                 
                 <NumberInput 
                     className="my-2"
