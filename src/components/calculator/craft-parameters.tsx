@@ -138,7 +138,7 @@ export default function CraftParameters(
                 <div className="w-full">
                     <Tooltip placement="top"  title={
                         <div className="text-base text-center">
-                            <span>Interval may not perfectly match the game speed due to network round trips. If the timing is off, try changing the &quot;network delay&quot; setting.</span>
+                            <span>Interval may not match the game speed. If the timing is off, try changing the &quot;Craft Delay&quot; setting to more closely match.</span>
                         </div>
                     }>
                         <div>
@@ -155,7 +155,7 @@ export default function CraftParameters(
                 </div>
                 <Tooltip placement="top" title={
                         <div className="text-base text-center">
-                            <span>Toggle: {isIntervalOverride ? "Calculated Mode" : "Edit Mode" } </span>
+                            <span>Toggle: {isIntervalOverride ? "Calculated Mode" : "Manual Mode" } </span>
                         </div>
                     }>
                     <Button
