@@ -2,10 +2,11 @@
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@mui/material";
+import { Link, ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { useMuiTheme } from "@/hooks/use-mui-theme";
 import SettingsDialog from "@/components/settings/settings-dialog";
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -46,8 +47,15 @@ export default function RootLayout({
                             <main>
                                 { children }
                             </main>
-                            <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-                                Not affiliated with Clockwork Laboratories, Inc.
+                            <footer className="flex gap-[24px] flex-wrap items-center justify-between">
+                                <div>
+                                    Not affiliated with Clockwork Laboratories, Inc.
+                                </div>
+                                <div>
+                                    <Link target="_blank" href="https://github.com/NewDark90/bitcraft-effort-calculator">
+                                        <GitHubIcon></GitHubIcon>
+                                    </Link>
+                                </div>
                             </footer>
                         </div>
                     </ThemeProvider>
