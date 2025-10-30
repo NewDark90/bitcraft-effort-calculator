@@ -3,7 +3,10 @@ export const isAudioPlaying = (audio: HTMLAudioElement): boolean => {
 } 
 
 /** Avoids playing the audio if it is already playing. */
-export const playAudioOnce = (audio: HTMLAudioElement) => {
+export const playAudioOnce = (audio: HTMLAudioElement | null | undefined) => {
+    if (audio == null) 
+        return; 
+    
     if (isAudioPlaying(audio)) 
         return;
 

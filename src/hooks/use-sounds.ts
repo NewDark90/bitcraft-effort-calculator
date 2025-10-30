@@ -1,5 +1,6 @@
 import { useSettings } from "@/hooks/use-settings";
 import { playAudioOnce } from "@/util/audio";
+import { minmax } from "@/util/minmax";
 import { useMemo } from "react";
 
 export const useSounds = (
@@ -8,30 +9,49 @@ export const useSounds = (
 
     const {
         settings: {
-            playAlarmAudio
+            playAlarmAudio,
+            alarmVolume,
+            alarmFile
         }
      } = useSettings();
 
+    const alarmAudio = useMemo(
+        () => {
+            if (typeof Audio === "undefined") {
+                return;
+            }
 
-    //const outOfStaminaAudio = useMemo(() => new Audio('/sounds/out-of-stamina.mp3'), []);
-    //const craftStartAudio = useMemo(() => new Audio('/sounds/craft-start.mp3'), []);
-    //const completeCraftAudio = useMemo(() => new Audio('/sounds/complete-craft.mp3'), []);
+            const audio = new Audio(alarmFile.value);
+            return audio;
+        }, 
+        [alarmFile.value]
+    );
+    
+    if (alarmAudio) {
+        alarmAudio.volume = alarmVolume.value;
+    }
 
-    const memeAlarm = useMemo(() => new Audio('/sounds/meme.mp3'), []);
+    const setAlarmVolume = async (volume: number) => {
+        if (!alarmAudio)
+            return;
+            
+        alarmAudio.volume = minmax(volume, 0, 1);
+        await alarmVolume.save(alarmAudio.volume);
+    }
 
     const tryPlayAudio = (type: "work-complete" | "stamina-complete") => {
         if (!playAlarmAudio.value)
             return;
 
         if (type === "work-complete") {
-            playAudioOnce(memeAlarm);
+            playAudioOnce(alarmAudio);
         } else if (type === "stamina-complete") {
-            playAudioOnce(memeAlarm);
+            playAudioOnce(alarmAudio);
         }
-
     };
 
     return {
-        tryPlayAudio
+        tryPlayAudio,
+        setAlarmVolume
     };
 };

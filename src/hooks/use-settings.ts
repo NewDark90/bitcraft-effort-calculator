@@ -31,6 +31,7 @@ export const useSettings = (
         return {
             id,
             value,
+            defaultValue,
             save: (value: TValue) => saveSetting(id, value)
         }
     }
@@ -42,6 +43,9 @@ export const useSettings = (
             notificationStyle: settingWrapper<NotificationStyle>(rawSettings, "notification-type", "when-away"),
             playAlarmAudio: settingWrapper<1 | 0>(rawSettings, "play-alarm-audio", 1),
             networkDelay: settingWrapper<number>(rawSettings, "network-delay", 100),
+            alarmVolume: settingWrapper<number>(rawSettings, "alarm-volume", 1),
+            alarmFile: settingWrapper<string>(rawSettings, "alarm-file", "/sounds/jobs-done.mp3"),
+            alarmName: settingWrapper<string>(rawSettings, "alarm-name", "Job's Done"),
         },
         saveSetting
     };

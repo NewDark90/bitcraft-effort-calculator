@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { ChangeEventHandler, useId, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { 
@@ -10,11 +10,23 @@ import {
     IconButton, 
     DialogTitle,
     CircularProgress,
-    DialogContent
+    DialogContent,
+    Stack,
+    Slider,
+    Button,
+    FormControl,
+    Select,
+    InputLabel,
+    MenuItem
 } from '@mui/material';
 import { useSettings } from '@/hooks/use-settings';
 import NumberInput from '@/components/common/number-input';
 import InfoIcon from '@mui/icons-material/Info';
+import VolumeDownIcon from '@mui/icons-material/VolumeDown';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import { defaultAlarms } from '@/config/sounds';
+import { useSounds } from '@/hooks/use-sounds';
 
 const labelWrapper = (title: React.ReactNode, tooltip?: React.ReactNode) => {
     return (
@@ -39,6 +51,7 @@ export type SettingsDialogProps = {
 export default function SettingsDialog(
     { buttonClassName }: SettingsDialogProps
 ) {
+    const id = useId();
     const [isOpen, setIsOpen] = useState(false);
 
     const openDialog = () => {
@@ -49,10 +62,44 @@ export default function SettingsDialog(
         setIsOpen(false);
     };
 
+    const [isLoadingUpload, setIsLoadingUpload] = useState(false);
+    const alarmInputRef = useRef<HTMLInputElement>(null);
+
     const { 
         isLoadingSettings,
         settings
     } = useSettings();
+
+    const { 
+        tryPlayAudio,
+        setAlarmVolume
+    } = useSounds();
+
+    const onFileUploadChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+        const selectedFiles = event.target.files;
+
+        if (!selectedFiles || selectedFiles.length == 0) {
+            return;
+        }
+        setIsLoadingUpload(true);
+        
+        const file = selectedFiles[0];
+
+        const reader = new FileReader();
+        reader.addEventListener("load", async () => {
+            Promise.all([
+                settings.alarmFile.save(reader.result as string),
+                settings.alarmName.save(file.name)
+            ])
+                .finally(() => {
+                    setIsLoadingUpload(false);
+                });
+        });
+        reader.addEventListener("error", () => {
+            setIsLoadingUpload(false);
+        })
+        reader.readAsDataURL(file);
+    }
 
     return (
         <>
@@ -101,6 +148,95 @@ export default function SettingsDialog(
                                         />
                                     }>
                                 </FormControlLabel>
+                                <FormControlLabel
+                                    labelPlacement='top'
+                                    label={labelWrapper("Alarm Volume")}
+                                    control={
+                                        <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1, width: "100%", maxWidth: "300px" }}>
+                                            <VolumeDownIcon />
+                                            <Slider 
+                                                aria-label="Volume" 
+                                                value={settings.alarmVolume.value} 
+                                                step={0.01}
+                                                min={0.01}
+                                                max={1}
+                                                onChange={async (_event, newValue) => { 
+                                                    await setAlarmVolume(newValue)
+                                                    tryPlayAudio("work-complete");
+                                                }} />
+                                            <VolumeUpIcon />
+                                        </Stack>
+                                    }>
+                                </FormControlLabel>
+
+                                <div>
+                                    {labelWrapper("Alarm Sound")}
+                                    <div className='flex flex-row flex-wrap items-center justify-evenly [&>*]:m-1'>
+                                        <span className='w-full text-center'>
+                                            {settings.alarmName.value}
+                                        </span>
+
+                                        <FormControl 
+                                            sx={{ minWidth: 140 }}
+                                        >
+                                            <InputLabel id={`preset-alarms-${id}`}>
+                                                Alarm
+                                            </InputLabel>
+                                            <Select
+                                                labelId={`preset-alarms-${id}`}
+                                                label={"Alarm Options"}
+                                                value={settings.alarmName.value}
+                                                autoWidth={true}
+                                                displayEmpty
+                                                onChange={(event) => {
+                                                    const alarm = defaultAlarms.find(a => a.name === event.target.value);
+                                                    if (alarm) {
+                                                        settings.alarmFile.save(alarm.filePath);
+                                                        settings.alarmName.save(alarm.name);
+                                                    }
+                                                }}
+                                            >
+                                                <MenuItem value="">
+                                                    &nbsp;
+                                                </MenuItem>
+                                                {
+                                                    defaultAlarms.map(alarm => (
+                                                        <MenuItem
+                                                            value={alarm.name}
+                                                            key={alarm.name}
+                                                        >
+                                                            {alarm.name}
+                                                        </MenuItem>
+                                                    ))
+                                                }
+                                            </Select>
+                                        </FormControl>
+                                        
+                                        <input
+                                            accept="audio/*, .mp3, .wav, .aac, .m4a, .webm"
+                                            style={{ display: 'none' }}
+                                            id="raised-button-file"
+                                            type="file"
+                                            ref={alarmInputRef}
+                                            onChange={onFileUploadChange}
+                                        />
+                                        
+                                        <Button variant="outlined" 
+                                            disabled={isLoadingUpload}
+                                            onClick={() => {
+                                                alarmInputRef.current?.click();
+                                            }}
+                                            startIcon={ 
+                                                isLoadingUpload 
+                                                    ? <CircularProgress />
+                                                    : <FileUploadIcon></FileUploadIcon>
+                                            }>
+                                            Custom Alarm
+                                        </Button>
+                                    </div>
+                                </div>
+                                
+                                
                                 {/* 
                                 This functionality won't work without a VAPID implementation that I'm not going to commit to (yet, maybe).
 

@@ -22,7 +22,10 @@ export const settingKeys = {
     notificationType: "notification-type",
     calculatorBlurStamp: "blurred-stamp",
     playAlarmAudio: "play-alarm-audio",
-    networkDelay: "network-delay"
+    networkDelay: "network-delay",
+    audioVolume: "alarm-volume",
+    alarmFile: "alarm-file",
+    alarmName: "alarm-name",
 } as const;
 
 export type SettingKeyType = typeof settingKeys[keyof typeof settingKeys];
