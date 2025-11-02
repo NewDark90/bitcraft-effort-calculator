@@ -5,7 +5,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { 
     FormGroup, 
     FormControlLabel, 
-    Switch, 
     Dialog, 
     IconButton, 
     DialogTitle,
