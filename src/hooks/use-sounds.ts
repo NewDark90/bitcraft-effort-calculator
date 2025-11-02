@@ -39,13 +39,15 @@ export const useSounds = (
         await alarmVolume.save(alarmAudio.volume);
     }
 
-    const tryPlayAudio = (type: "work-complete" | "stamina-complete") => {
+    const tryPlayAudio = (type: "work-complete" | "stamina-complete" | "stamina-full") => {
         if (!playAlarmAudio.value)
             return;
 
-        if (type === "work-complete") {
+        if (type === "work-complete" && playAlarmAudio.value === "out-of-stamina") {
             playAudioOnce(alarmAudio);
-        } else if (type === "stamina-complete") {
+        } else if (type === "stamina-complete" && playAlarmAudio.value === "out-of-stamina") {
+            playAudioOnce(alarmAudio);
+        } else if (type === "stamina-full" && playAlarmAudio.value === "stamina-full") {
             playAudioOnce(alarmAudio);
         }
     };

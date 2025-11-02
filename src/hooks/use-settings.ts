@@ -1,5 +1,5 @@
 import { calculatorDatabase } from "@/database/db";
-import { NotificationStyle, SettingEntity, SettingKeyType } from "@/database/tables/settings";
+import { AlarmRulesKey, NotificationStyle, SettingEntity, SettingKeyType } from "@/database/tables/settings";
 import { IDBValidProp } from "@/database/util";
 import { useLiveQuery } from "dexie-react-hooks";
 
@@ -41,7 +41,7 @@ export const useSettings = (
         rawSettings,
         settings: {
             notificationStyle: settingWrapper<NotificationStyle>(rawSettings, "notification-type", "when-away"),
-            playAlarmAudio: settingWrapper<1 | 0>(rawSettings, "play-alarm-audio", 1),
+            playAlarmAudio: settingWrapper<AlarmRulesKey>(rawSettings, "play-alarm-audio", "out-of-stamina"),
             networkDelay: settingWrapper<number>(rawSettings, "network-delay", 100),
             alarmVolume: settingWrapper<number>(rawSettings, "alarm-volume", 1),
             alarmFile: settingWrapper<string>(rawSettings, "alarm-file", "/sounds/jobs-done.mp3"),

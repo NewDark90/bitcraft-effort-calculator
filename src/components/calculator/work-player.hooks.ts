@@ -159,6 +159,10 @@ export const useWorkPlayerState = (
     const doStaminaRegen = (ratio: number = 1) => {
         const newStamina =  minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
         _setCurrentStamina(newStamina); 
+        if (newStamina != currentStamina && newStamina == armor.stamina) {
+            //Filled Stamina
+            tryPlayAudio("stamina-full");
+        }
         return newStamina;
     }
 
@@ -356,6 +360,8 @@ export const useWorkPlayerInteractivity = (
     });
 
     if (previousFullStamina != fullStamina) {
+        // It's possible that someone has changed their stamina values through armor and returned to the page.
+        // The calculation should happen outside of this page specifically in a wrapper component that doesn't control display, but for now this at least prevents weird issues.
         setPreviousFullStamina(fullStamina);
         setCurrentStamina(fullStamina);
         setIsWorking(false);

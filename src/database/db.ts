@@ -13,7 +13,7 @@ export type BitcraftCalculatorDatabase = Dexie & {
 
 const calculatorDatabase = new Dexie('BitcraftCalculatorDatabase') as BitcraftCalculatorDatabase;
 
-calculatorDatabase.version(1).stores({
+calculatorDatabase.version(2).stores({
     skills: skillColumns.join(", "),
     armors: armorColumns.join(", "),
     foods: foodColumns.join(", "),

@@ -27,6 +27,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { defaultAlarms } from '@/config/sounds';
 import { useSounds } from '@/hooks/use-sounds';
+import { alarmRules } from '@/database';
 
 const labelWrapper = (title: React.ReactNode, tooltip?: React.ReactNode) => {
     return (
@@ -140,12 +141,35 @@ export default function SettingsDialog(
 
                                 <FormControlLabel 
                                     labelPlacement='top'
-                                    label={labelWrapper("Play Audio Alarm")}
+                                    label={labelWrapper("Alarm")}
                                     control={
-                                        <Switch 
-                                            checked={settings.playAlarmAudio.value === 1}  
-                                            onChange={event => settings.playAlarmAudio.save(event.target.checked ? 1 : 0)}
-                                        />
+                                        <FormControl 
+                                            sx={{ minWidth: 140 }}
+                                        >
+                                            <InputLabel id={`play-alarm-${id}`}>
+                                                Play When...
+                                            </InputLabel>
+                                            <Select
+                                                labelId={`play-alarm-${id}`}
+                                                label={"Alarm Rule"}
+                                                value={settings.playAlarmAudio.value}
+                                                autoWidth={true}
+                                                onChange={(event) => {
+                                                    settings.playAlarmAudio.save(event.target.value);
+                                                }}
+                                            >
+                                                {
+                                                    alarmRules.map(alarmRule => (
+                                                        <MenuItem
+                                                            value={alarmRule.value}
+                                                            key={alarmRule.value}
+                                                        >
+                                                            {alarmRule.name}
+                                                        </MenuItem>
+                                                    ))
+                                                }
+                                            </Select>
+                                        </FormControl>
                                     }>
                                 </FormControlLabel>
                                 <FormControlLabel
@@ -213,7 +237,7 @@ export default function SettingsDialog(
                                         </FormControl>
                                         
                                         <input
-                                            accept="audio/*, .mp3, .wav, .aac, .m4a, .webm"
+                                            accept=".mp3, .wav, .aac, .m4a, .webm"
                                             style={{ display: 'none' }}
                                             id="raised-button-file"
                                             type="file"

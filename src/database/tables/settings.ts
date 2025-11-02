@@ -37,6 +37,13 @@ export const settingColumns = (
     ] satisfies Array<keyof SettingEntity>
 );
 
+export const alarmRules = [
+    { name: "Out of Stamina", value: "out-of-stamina" },
+    { name: "Stamina Full", value: "stamina-full" },
+    { name: "Never", value: "never" },
+] as const
+
+export type AlarmRulesKey = typeof alarmRules[number]['value'];
 
 export const initializeSettings = async (db: BitcraftCalculatorDatabase) => {
 
@@ -56,8 +63,15 @@ export const initializeSettings = async (db: BitcraftCalculatorDatabase) => {
     if (!playAlarmAudioSetting) {
         missingSettings.push({
            id: settingKeys.playAlarmAudio,
-           value: 1
-        } satisfies SettingEntity<typeof settingKeys.playAlarmAudio, 1|0>);
+           value: "out-of-stamina"
+        } satisfies SettingEntity<typeof settingKeys.playAlarmAudio, AlarmRulesKey>);
+    }
+    else if (typeof playAlarmAudioSetting?.value === "number") {
+        // Converting the on/off bit to a slug for previous version of this property.
+        await db.settings.put({
+           id: settingKeys.playAlarmAudio,
+           value: playAlarmAudioSetting?.value === 0 ? "never" : "out-of-stamina"
+        } satisfies SettingEntity<typeof settingKeys.playAlarmAudio, AlarmRulesKey>);
     }
 
     const networkDelaySetting = currentSettings.find(setting => setting.id === settingKeys.networkDelay);
@@ -68,5 +82,5 @@ export const initializeSettings = async (db: BitcraftCalculatorDatabase) => {
         } satisfies SettingEntity<typeof settingKeys.networkDelay, number>);
     }
 
-    db.settings.bulkAdd(missingSettings);
+    await db.settings.bulkAdd(missingSettings);
 }
