@@ -1,6 +1,6 @@
 import NumberInput from "@/components/common/number-input";
-import { Button, FormControl, InputLabel, MenuItem, Select, Tooltip } from "@mui/material";
-import React from "react";
+import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tooltip } from "@mui/material";
+import React, { useCallback } from "react";
 import clsx from "clsx";
 import { TierNumber } from "@/config/tier";
 import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
@@ -52,6 +52,37 @@ export default function CraftParameters(
 ) {
     const id = React.useId();
 
+    const onCurrentEffortChangeHandler = (effort: number | null) => {
+        if (effort == null) 
+            return;
+        onCurrentEffortChange(effort);
+    };
+
+    const onFullEffortChangeHandler = (effort: number | null) => {
+        if (effort == null) 
+            return;
+        onFullEffortChange(effort);
+    };
+
+    const onCraftTypeChangeHandler = (event: SelectChangeEvent<CraftingTypeSlug>) => {
+        const type = event.target.value as CraftingTypeSlug;
+        if (type == null) {
+            return;
+        }
+        onCraftTypeChange(type);
+    };
+
+    const onCraftTierChangeHandler = (tier: TierNumber) => {
+        onCraftTierChange(tier);
+    };
+
+    const onManualIntervalChangeHandler = (interval: number | null) => {
+        if (!interval)
+            return;
+
+        onManualIntervalChange(interval);
+    };
+
     return (
         <div className={clsx("flex flex-wrap items-end justify-center my-2 [&>*]:my-2", className)}>
             
@@ -64,11 +95,7 @@ export default function CraftParameters(
                     min={ 0 }
                     max={ fullEffort }
                     readOnly={ isWorking }
-                    onValueChange={(effort) => {
-                        if (effort == null) 
-                            return;
-                        onCurrentEffortChange(effort);
-                    }}
+                    onValueChange={onCurrentEffortChangeHandler}
                 >
                 </NumberInput>
                 <span className="font-extrabold text-2xl my-1">/</span>
@@ -79,11 +106,7 @@ export default function CraftParameters(
                     step={ 0 }
                     min={ 0 }
                     readOnly={ isWorking }
-                    onValueChange={(effort) => {
-                        if (effort == null) 
-                            return;
-                        onFullEffortChange(effort);
-                    }}
+                    onValueChange={onFullEffortChangeHandler}
                 >
                 </NumberInput>
             </div>
@@ -99,13 +122,7 @@ export default function CraftParameters(
                     labelId={`crafting-type-label-${id}`}
                     label={"Type"}
                     value={craftType}
-                    onChange={(event) => {
-                        const type = event.target.value as CraftingTypeSlug;
-                        if (type == null) {
-                            return;
-                        }
-                        onCraftTypeChange(type);
-                    }}
+                    onChange={onCraftTypeChangeHandler}
                 >
                     {
                         craftingTypes.map(type => (
@@ -125,9 +142,7 @@ export default function CraftParameters(
                 &&
                 <TierSelector 
                     tier={craftingTier}
-                    onTierChange={(tier) => {
-                        onCraftTierChange(tier);
-                    }}
+                    onTierChange={onCraftTierChangeHandler}
                     >
 
                 </TierSelector>
@@ -179,12 +194,7 @@ export default function CraftParameters(
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 2
                     }}
-                    onValueChange={(interval) => {
-                        if (!interval)
-                            return;
-
-                        onManualIntervalChange(interval);
-                    }}
+                    onValueChange={onManualIntervalChangeHandler}
                 >
                 </NumberInput>
             </div>

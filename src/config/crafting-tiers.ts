@@ -6,6 +6,7 @@ export type CraftingTier = {
 }
 
 export const craftingTiers: CraftingTier[] = [
+    { tierId: 0,  color: 'var(--tier0)' },
     { tierId: 1,  color: 'var(--tier1)' },
     { tierId: 2,  color: 'var(--tier2)' },
     { tierId: 3,  color: 'var(--tier3)' },

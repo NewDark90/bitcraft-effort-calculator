@@ -7,14 +7,28 @@ import TierLabel from "@/components/tier-label";
 
 export type TierSelectorProps = { 
     tier?: TierNumber;
+    subsetTiers?: TierNumber[];
+    includeZero?: boolean;
     onTierChange?: (tier: TierNumber) => void;
+
     className?: string; 
 };
 
 export default function TierSelector(
-    { tier, onTierChange, className }: TierSelectorProps
+    { 
+        tier, 
+        subsetTiers,
+        onTierChange, 
+        className,
+    }: TierSelectorProps
 ) {
     const id = useId();
+
+    const menuTiers = craftingTiers
+        .filter(tier => 
+            subsetTiers == null || 
+            subsetTiers.some(subsetTier => subsetTier === tier.tierId)
+        );
 
     return (
         <FormControl 
@@ -35,7 +49,8 @@ export default function TierSelector(
                 }}
             >
                 {
-                    craftingTiers.map(tier => (
+                    menuTiers
+                        .map(tier => (
                         <MenuItem
                             value={tier.tierId}
                             key={tier.tierId}

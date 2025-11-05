@@ -14,7 +14,7 @@ export default function TierLabel(
 
     return (
         <span className={className}>
-            <SquareIcon htmlColor={tier.color}></SquareIcon>
+            <SquareIcon htmlColor={tier.color} className='border border-neutral-500'></SquareIcon>
             &nbsp;
             Tier { tier.tierId }
         </span>

@@ -11,7 +11,7 @@ import { useSettings } from "@/hooks/use-settings";
 import { useSounds } from "@/hooks/use-sounds";
 import { useWakeLock } from "@/hooks/use-wake-lock";
 import { minmax } from "@/util/minmax";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useEventListener, useInterval, useLocalStorage } from "usehooks-ts";
 
 
@@ -157,14 +157,14 @@ export const useWorkPlayerState = (
     };
 
     const doStaminaRegen = (ratio: number = 1) => {
-        const newStamina =  minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
+        const newStamina = minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
         _setCurrentStamina(newStamina); 
         if (newStamina != currentStamina && newStamina == armor.stamina) {
             //Filled Stamina
             tryPlayAudio("stamina-full");
         }
         return newStamina;
-    }
+    };
 
     const doWork = (ratio: number = 1) => {
         const newStamina = currentStamina - (staminaCost * ratio);
@@ -184,7 +184,7 @@ export const useWorkPlayerState = (
             _setIsWorking(false);
             return;
         }
-    }
+    };
 
     const doWorkBatch = (timeDelta: number) => {
         let newStamina = currentStamina;
@@ -209,7 +209,7 @@ export const useWorkPlayerState = (
         const staminaTicks = Math.floor(timeDelta / 1000);
         const staminaRegenerated = staminaRegenRate * staminaTicks;
         _setCurrentStamina(minmax(newStamina + staminaRegenerated, 0, armor.stamina));      
-    }
+    };
 
 
     const workProgressStats = ((): WorkProgressStats => {
@@ -287,7 +287,7 @@ export const useWorkPlayerState = (
         craftingTier,
         isWorking,
         workInterval,
-        isIntervalOverride: isIntervalOverride, 
+        isIntervalOverride, 
         staminaCost,
         workProgressStats,
 

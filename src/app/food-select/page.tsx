@@ -2,9 +2,9 @@
 
 import { NoSSR } from 'next-dynamic-no-ssr';
 import { useLiveQuery } from "dexie-react-hooks";
-import { calculatorDatabase, deselectAllEntities, FoodType, foodTypes, selectEntity } from "@/database";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { useId, useState } from "react";
+import { calculatorDatabase, deselectAllEntities, FoodEntity, foodOverrideId, FoodType, foodTypes, selectEntity } from "@/database";
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Switch, Tooltip } from "@mui/material";
+import { ChangeEvent, useCallback, useId, useMemo, useState } from "react";
 import { TierNumber } from "@/config/tier";
 import TierSelector from "@/components/tier-selector";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
@@ -12,21 +12,84 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import clsx from "clsx";
 import CalculatorNavLink from "@/components/calculator-nav-link";
 import { useEffectChange } from '@/hooks/use-effect-change';
+import NumberInput from '@/components/common/number-input';
 
 export default function FoodSelect() {
 
     const id = useId();
+    const staminaRegenFormatter = useMemo(() => {
+        return new Intl.NumberFormat('en-US', {
+            style: 'decimal', 
+            maximumFractionDigits: 2, 
+            minimumFractionDigits: 0, 
+        })
+    }, [])
 
     const foods = useLiveQuery(async () => await calculatorDatabase.foods.toArray());
     const selectedFood = foods?.find(f => f.selected);
 
     const [selectedType, setSelectedType] = useState<FoodType|"">("");
     const [selectedTier, setSelectedTier] = useState<TierNumber|"">("");
+
+    const isOverride = selectedFood?.id === foodOverrideId;
+    const validTiers = foods?.filter(f => f.type === selectedType && f.id !== foodOverrideId).map(f => f.tier);
     
     useEffectChange(() => {
         setSelectedType(selectedFood?.type ?? "");
         setSelectedTier(selectedFood?.tier ?? "");
     }, [foods != null]);
+
+    const selectPresetFood = async (type: FoodType | "", tier: TierNumber | "") => {
+        const toSelectFood = foods?.find(f => f.type === type && f.tier === tier);
+        if (toSelectFood) {
+            await selectEntity(calculatorDatabase.foods, toSelectFood);
+        }
+    }
+
+    const patchFood = async (food: FoodEntity | undefined, changes: Partial<FoodEntity>) => {
+        if (!food) return;
+
+        await calculatorDatabase.foods.put({
+            ...food,
+            ...changes
+        });
+    }
+    
+    const onModeChange = async (event: ChangeEvent<HTMLInputElement>, overrideToggle: boolean) => {
+        if (overrideToggle) {
+            await deselectAllEntities(calculatorDatabase.foods, foods);
+            const overrideFood = foods?.find(f => f.id === foodOverrideId) as FoodEntity;
+            await patchFood(overrideFood, {selected: 1});
+        } else {
+            const previousFoodPreset = foods?.find(f => f.type === selectedType && f.tier === selectedTier);
+            const foodPreset = previousFoodPreset?.id !== foodOverrideId 
+                ? previousFoodPreset 
+                : foods?.[0];
+            if (foodPreset) {
+                await selectEntity(calculatorDatabase.foods, foodPreset);
+            }
+        }
+    }
+
+    const onTypeChange = async (event: SelectChangeEvent<FoodType | "">) => {
+        const type = event.target.value as FoodType | "";
+        setSelectedType(type);
+        if (type == null) {
+            await deselectAllEntities(calculatorDatabase.foods, foods);
+            return;
+        }
+
+        await selectPresetFood(type, selectedTier);
+    }
+
+    const onTierChange = async (tier: TierNumber) => {
+        setSelectedTier(tier === 0 ? "" : tier);
+        if (tier == null) {
+            await deselectAllEntities(calculatorDatabase.foods, foods);
+            return;
+        }
+        await selectPresetFood(selectedType, tier);
+    }
 
     const titleCss = "my-6 text-2xl text-center font-bold leading-none tracking-tight text-gray-950 md:text-3xl lg:text-4xl";
 
@@ -40,17 +103,47 @@ export default function FoodSelect() {
                     Food
                 </h2>
                 
-                <div className={clsx( "m-4 text-center flex flex-row items-baseline justify-evenly", selectedFood ? "" : "invisible")}>
-                    <div>
-                        <span className="w-full block">
-                            <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
-                            <AutorenewIcon></AutorenewIcon>
-                            Stamina Regen
-                        </span>
-                        <span className="font-bold">
-                            {(selectedFood?.staminaRegen ?? 0).toFixed(0)}
-                        </span>
-                    </div>
+                <div className={clsx("m-4 text-center flex flex-row items-baseline justify-evenly [&>*]:m-1")}>
+                    <Tooltip 
+                        placement="top"  
+                        title={
+                            <div className="text-base text-center">
+                                <span>Only regenerates while <span className="font-bold italic">not</span> crafting.</span>
+                            </div>
+                        }
+                    >
+                        <div>
+                            <span className="w-full block">
+                                Passive Stamina Regen
+                            </span>
+                            <span className="font-bold">
+                                {staminaRegenFormatter.format(selectedFood?.staminaRegen ?? 0)}
+                                &nbsp;
+                                <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
+                                <AutorenewIcon></AutorenewIcon>
+                            </span>
+                        </div>
+                    </Tooltip>
+                    <Tooltip 
+                        placement="top"  
+                        title={
+                            <div className="text-base text-center">
+                                <span>Always active, even while crafting.</span>
+                            </div>
+                        }
+                    >
+                        <div>
+                            <span className="w-full block">
+                                Active Stamina Regen
+                            </span>
+                            <span className="font-bold">
+                                {staminaRegenFormatter.format(selectedFood?.activeStaminaRegen ?? 0)}
+                                &nbsp;
+                                <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
+                                <AutorenewIcon></AutorenewIcon>
+                            </span>
+                        </div>
+                    </Tooltip>
                     <div>
                         <span className="w-full block">
                             Gather Bonus
@@ -69,7 +162,22 @@ export default function FoodSelect() {
                     </div>
                 </div>
 
-                <div className="flex flex-col justify-center align-center">
+                <div className="flex flex-row justify-center items-center">
+                    <div>
+                        Presets
+                    </div>
+                    <Switch
+                        checked={isOverride}
+                        onChange={onModeChange}
+                    >
+                    </Switch>
+                    <div>
+                        Manual
+                    </div>
+                </div>
+
+                {/* Preset Foods */}
+                <div className={clsx("flex flex-col justify-center items-center", isOverride ? "hidden" : "")} >
                     <FormControl 
                         sx={{ minWidth: 220 }}
                         className="m-4"
@@ -81,18 +189,7 @@ export default function FoodSelect() {
                             labelId={`crafting-type-label-${id}`}
                             label={"Type"}
                             value={selectedType}
-                            onChange={async (event) => {
-                                const type = event.target.value as FoodType | "";
-                                setSelectedType(type);
-                                if (type == null) {
-                                    await deselectAllEntities(calculatorDatabase.foods, foods);
-                                    return;
-                                }
-                                const toSelectFood = foods?.find(f => f.type === type && f.tier === selectedTier);
-                                if (toSelectFood) {
-                                    await selectEntity(calculatorDatabase.foods, toSelectFood);
-                                }
-                            }}
+                            onChange={onTypeChange}
                         >
                             {
                                 foodTypes.map(type => (
@@ -106,24 +203,99 @@ export default function FoodSelect() {
                             }
                         </Select>
                     </FormControl>
+
                     <TierSelector 
                         className="m-4"
                         tier={selectedTier === "" ? 0 : selectedTier}
-                        onTierChange={async (tier) => {
-                            setSelectedTier(tier === 0 ? "" : tier);
-                            if (tier == null) {
-                                await deselectAllEntities(calculatorDatabase.foods, foods);
-                                return;
-                            }
-                            const toSelectFood = foods?.find(f => f.type === selectedType && f.tier === tier);
-                            if (toSelectFood) {
-                                await selectEntity(calculatorDatabase.foods, toSelectFood);
-                            }
-                        }}
+                        subsetTiers={validTiers}
+                        onTierChange={onTierChange}
                         >
-
                     </TierSelector>
                     
+                </div>
+
+                {/* Manual Settings */}
+                <div className={clsx("flex flex-col justify-center items-center", isOverride ? "" : "hidden")} >
+                   <NumberInput 
+                        className="my-2"
+                        value={selectedFood?.staminaRegen ?? 0} 
+                        label={
+                            <span className="mx-1">Passive Stamina Regen</span>
+                        }
+                        step={1}
+                        min={0.01}
+                        format={{
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }}
+                        onValueChange={async (passiveStaminaRegen) => {
+                            if (passiveStaminaRegen == null) 
+                                return;
+                            await patchFood(selectedFood, {staminaRegen: passiveStaminaRegen})
+                        }}
+                    >
+                    </NumberInput>
+
+                    <NumberInput 
+                        className="my-2"
+                        value={selectedFood?.activeStaminaRegen ?? 0} 
+                        label={
+                            <span className="mx-1">Active Stamina Regen</span>
+                        }
+                        step={1}
+                        min={0.01}
+                        format={{
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }}
+                        onValueChange={async (activeStaminaRegen) => {
+                            if (activeStaminaRegen == null) 
+                                return;
+                            await patchFood(selectedFood, {activeStaminaRegen: activeStaminaRegen})
+                        }}
+                    >
+                    </NumberInput>
+
+                    <NumberInput 
+                        className="my-2"
+                        value={(selectedFood?.gatherBonus ?? 0) * 100} 
+                        label={
+                            <span className="mx-1">Gather Bonus %</span>
+                        }
+                        step={1}
+                        min={0.01}
+                        format={{
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }}
+                        onValueChange={async (gatherBonus) => {
+                            if (gatherBonus == null) 
+                                return;
+                            await patchFood(selectedFood, {gatherBonus: (gatherBonus / 100)})
+                        }}
+                    >
+                    </NumberInput>
+
+                    <NumberInput 
+                        className="my-2"
+                        value={(selectedFood?.craftBonus ?? 0) * 100} 
+                        label={
+                            <span className="mx-1">Craft Bonus %</span>
+                        }
+                        step={1}
+                        min={0.01}
+                        format={{
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }}
+                        onValueChange={async (craftBonus) => {
+                            if (craftBonus == null) 
+                                return;
+                            await patchFood(selectedFood, {craftBonus: (craftBonus / 100)})
+                        }}
+                    >
+                    </NumberInput>
+
                 </div>
             </section>
         </NoSSR>
