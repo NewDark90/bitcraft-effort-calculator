@@ -39,7 +39,7 @@ export type UseWorkPlayerStateReturn = {
     setManualInterval: Dispatch<SetStateAction<number>> 
     doWork: (ratio?: number) => void; 
     doWorkBatch: (timeDelta: number) => void; 
-    doStaminaRegen: (ratio?: number) => void; 
+    doPassiveStaminaRegen: (ratio?: number) => void; 
 };
 
 
@@ -135,6 +135,7 @@ export const useWorkPlayerState = (
         ? getWorkIntervalFromSeconds(manualInterval)
         : getWorkInterval(craftingType, [armor, food]);
 
+    const fullStamina = armor.stamina;
     const staminaCost = getStaminaCost(craftingType, craftingTier);
     const staminaRegenRate = flatStaminaRegenRate + (food?.staminaRegen ?? 0);
 
@@ -156,24 +157,23 @@ export const useWorkPlayerState = (
         _setCurrentStamina(armor.stamina);
     };
 
-    const doStaminaRegen = (ratio: number = 1) => {
-        const newStamina = minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
-        _setCurrentStamina(newStamina); 
-        if (newStamina != currentStamina && newStamina == armor.stamina) {
-            //Filled Stamina
-            tryPlayAudio("stamina-full");
-        }
-        return newStamina;
+    const doPassiveStaminaRegen = (ratio: number = 1) => {
+        _setCurrentStamina(currentStamina => {
+            return minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
+        });
     };
 
     const doWork = (ratio: number = 1) => {
-        const newStamina = currentStamina - (staminaCost * ratio);
+        let newStamina = currentStamina - (staminaCost * ratio);
         if (newStamina <= 0) {
             // Stop, not done
             tryPlayAudio("stamina-complete");
             _setIsWorking(false);
             return;
         }
+        const activeRegen = (food?.activeStaminaRegen ?? 0) * workInterval.effective * ratio;
+        newStamina += activeRegen;
+        newStamina = minmax(newStamina, 0, fullStamina)
         _setCurrentStamina(newStamina); 
 
         const newEffort = setCurrentEffort(currentEffort + (skill.power * ratio));
@@ -282,7 +282,7 @@ export const useWorkPlayerState = (
         fullEffort,
         currentEffort,
         currentStamina,
-        fullStamina: armor.stamina,
+        fullStamina,
         craftingType,
         craftingTier,
         isWorking,
@@ -303,7 +303,7 @@ export const useWorkPlayerState = (
         setManualInterval: _setManualInterval,
         doWork, 
         doWorkBatch,
-        doStaminaRegen,
+        doPassiveStaminaRegen,
     };
 
     return result;
@@ -316,10 +316,11 @@ export const useWorkPlayerInteractivity = (
         isWorking,
         doWork,
         workInterval,
-        doStaminaRegen,
+        doPassiveStaminaRegen,
         doWorkBatch,
         workProgressStats,
         setCurrentStamina,
+        currentStamina,
         fullStamina,
         setIsWorking,
     }: UseWorkPlayerInteractivityParameters
@@ -367,9 +368,17 @@ export const useWorkPlayerInteractivity = (
         setIsWorking(false);
     }
 
+    // Full Stamina Audio
+    useEffectChange(() => {
+        if (currentStamina == fullStamina && !isWorking) {
+            tryPlayAudio("stamina-full");
+        }
+    }, [currentStamina])
+
     useEventListener(
         "blur", 
         async (_event) => {
+            /*
             if (isWorking) {
                 await calculatorDatabase.settings.put({
                     id: settingKeys.calculatorBlurStamp,
@@ -390,6 +399,7 @@ export const useWorkPlayerInteractivity = (
                     // Could ignore this case given ~94% support.
                 }
             }
+            */
 
             setIsFocused(false);
         }, 
@@ -399,7 +409,7 @@ export const useWorkPlayerInteractivity = (
     useEventListener(
         "focus", 
         async (_event) => {
-            
+            /*
             if (isWorking) {
                 // In this case, we've lost focus, and regained it before the service worker recognizes it being done. 
                 // Fast-forward the work steps to current time. 
@@ -420,6 +430,7 @@ export const useWorkPlayerInteractivity = (
                     payload: null
                 } satisfies ServiceWorkerMessageEventRequest);
             }
+            */
             setIsFocused(true);
         }, 
         documentRef
@@ -430,15 +441,15 @@ export const useWorkPlayerInteractivity = (
         () => {
             doWork(1)
         },
-        isWorking && isFocused ? workInterval.effectiveMs + networkDelay.value : null
+        isWorking  /* && isFocused */ ? workInterval.effectiveMs + networkDelay.value : null
     )
 
     // Stamina Regen
     useInterval(
         () => {
-            doStaminaRegen(1);  
+            doPassiveStaminaRegen(1);  
         },
-        !isWorking && isFocused ? 1000 + networkDelay.value : null
+        !isWorking /* && isFocused */ ? 1000 + networkDelay.value : null
     )
 
     useEffectChange(() => {

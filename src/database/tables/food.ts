@@ -3,7 +3,7 @@ import { TierNumber } from "@/config/tier";
 import { BitcraftCalculatorDatabase } from "@/database/db";
 import { slugify } from "@/database/util";
 
-export const foodTypes = ["Basic Food", "Meal", "Fish Meal", "Deluxe Fish Meal", "Pumpkin Pie"] as const;
+export const foodTypes = ["Basic Food", "Meal", "Fish Meal", "Deluxe Fish Meal", "Pumpkin Pie", "Custom Food"] as const;
 
 export type FoodType = typeof foodTypes[number];
 
@@ -62,7 +62,7 @@ export const initializeFood = async (db: BitcraftCalculatorDatabase) => {
     for (const tier of validFoodTiers) {
         for(const foodType of foodTypes) {
 
-            if (foodType === "Pumpkin Pie")
+            if (foodType === "Pumpkin Pie" || foodType === "Custom Food")
                 continue;
 
             const id = getFoodId(foodType, tier);
@@ -117,7 +117,7 @@ export const initializeFood = async (db: BitcraftCalculatorDatabase) => {
     const overrideFood = await db.foods.get(foodOverrideId);
     if (overrideFood == null) {
         await db.foods.add(
-            getDefaultFood(foodOverrideId, 0, "Meal"), 
+            getDefaultFood(foodOverrideId, 0, "Custom Food"), 
             foodOverrideId
         );
     }

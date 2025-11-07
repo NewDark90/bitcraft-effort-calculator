@@ -8,22 +8,18 @@ import { ChangeEvent, useCallback, useId, useMemo, useState } from "react";
 import { TierNumber } from "@/config/tier";
 import TierSelector from "@/components/tier-selector";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
 import clsx from "clsx";
 import CalculatorNavLink from "@/components/calculator-nav-link";
 import { useEffectChange } from '@/hooks/use-effect-change';
 import NumberInput from '@/components/common/number-input';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import { useFormatters } from '@/hooks/use-formatters';
 
 export default function FoodSelect() {
 
     const id = useId();
-    const staminaRegenFormatter = useMemo(() => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'decimal', 
-            maximumFractionDigits: 2, 
-            minimumFractionDigits: 0, 
-        })
-    }, [])
+    const { staminaRegenFormatter } = useFormatters();
 
     const foods = useLiveQuery(async () => await calculatorDatabase.foods.toArray());
     const selectedFood = foods?.find(f => f.selected);
@@ -117,10 +113,10 @@ export default function FoodSelect() {
                                 Passive Stamina Regen
                             </span>
                             <span className="font-bold">
-                                {staminaRegenFormatter.format(selectedFood?.staminaRegen ?? 0)}
-                                &nbsp;
+                                <PauseIcon></PauseIcon>
                                 <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
-                                <AutorenewIcon></AutorenewIcon>
+                                &nbsp;
+                                {staminaRegenFormatter.format(selectedFood?.staminaRegen ?? 0)}
                             </span>
                         </div>
                     </Tooltip>
@@ -137,10 +133,10 @@ export default function FoodSelect() {
                                 Active Stamina Regen
                             </span>
                             <span className="font-bold">
-                                {staminaRegenFormatter.format(selectedFood?.activeStaminaRegen ?? 0)}
-                                &nbsp;
+                                <PlayArrowIcon></PlayArrowIcon>
                                 <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
-                                <AutorenewIcon></AutorenewIcon>
+                                &nbsp;
+                                {staminaRegenFormatter.format(selectedFood?.activeStaminaRegen ?? 0)}
                             </span>
                         </div>
                     </Tooltip>
@@ -192,14 +188,16 @@ export default function FoodSelect() {
                             onChange={onTypeChange}
                         >
                             {
-                                foodTypes.map(type => (
-                                    <MenuItem
-                                        value={type}
-                                        key={type}
-                                    >
-                                        { type }
-                                    </MenuItem>
-                                ))
+                                foodTypes
+                                    .filter(type => type != 'Custom Food')
+                                    .map(type => (
+                                        <MenuItem
+                                            value={type}
+                                            key={type}
+                                        >
+                                            { type }
+                                        </MenuItem>
+                                    ))
                             }
                         </Select>
                     </FormControl>
@@ -242,7 +240,7 @@ export default function FoodSelect() {
                         label={
                             <span className="mx-1">Active Stamina Regen</span>
                         }
-                        step={1}
+                        step={0.1}
                         min={0.01}
                         format={{
                             minimumFractionDigits: 0,

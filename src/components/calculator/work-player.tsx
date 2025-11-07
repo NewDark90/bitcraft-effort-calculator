@@ -46,7 +46,8 @@ export default function WorkPlayer(
         setCurrentStamina,
         workProgressStats,
         isWorking, setIsWorking,
-        doWork, restart,
+        doWork, 
+        restart,
     } = workPlayerState;
 
     useEffectChange(() => {
@@ -54,6 +55,14 @@ export default function WorkPlayer(
     }, [craftingType]);
 
     const isEffortDone = currentEffort === fullEffort;
+
+    const goBack = () => {
+        doWork(-1);
+    }
+
+    const goForward = () => {
+        doWork(1);
+    }
 
     return (
         <div className="w-full">
@@ -95,7 +104,7 @@ export default function WorkPlayer(
                             <Button 
                                 variant="text"
                                 className="mx-2 p-2 md:px-8 md:py-3"
-                                onClick={() => doWork(-1)}
+                                onClick={goBack}
                             >
                                 <UndoIcon color="info" fontSize="large"></UndoIcon>
                             </Button>
@@ -113,7 +122,7 @@ export default function WorkPlayer(
                             <Button 
                                 variant="text"
                                 className="mx-2 p-2 md:px-8 md:py-3"
-                                onClick={() => doWork(1)}
+                                onClick={goForward}
                             >
                                 <RedoIcon color="info" fontSize="large"></RedoIcon>
                             </Button>

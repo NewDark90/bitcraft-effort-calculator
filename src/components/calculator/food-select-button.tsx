@@ -5,6 +5,9 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { CraftingTypeSlug } from "@/config/crafting-types";
 import { useTheme } from "@mui/material/styles";
+import { useFormatters } from "@/hooks/use-formatters";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 
 export type FoodSelectButtonProps = { 
     food?: FoodEntity;
@@ -16,6 +19,8 @@ export default function FoodSelectButton(
 ) {
 
     const theme = useTheme();
+    
+    const { staminaRegenFormatter } = useFormatters();
 
     return (
         <ButtonLink
@@ -40,11 +45,20 @@ export default function FoodSelectButton(
             <div className={"w-full text-center flex flex-row justify-evenly"}>
                 <div>
                     <span className="w-full block">
+                        <PauseIcon></PauseIcon>
                         <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
-                        <AutorenewIcon></AutorenewIcon>
                     </span>
                     <span>
-                        {(food?.staminaRegen ?? 0).toFixed(0)}
+                        {staminaRegenFormatter.format(food?.staminaRegen ?? 0)}
+                    </span>
+                </div>
+                <div>
+                    <span className="w-full block">
+                        <PlayArrowIcon></PlayArrowIcon>
+                        <ElectricBoltIcon htmlColor="var(--energy, yellow)"></ElectricBoltIcon>
+                    </span>
+                    <span>
+                        {staminaRegenFormatter.format(food?.activeStaminaRegen ?? 0)}
                     </span>
                 </div>
                 <div style={{
