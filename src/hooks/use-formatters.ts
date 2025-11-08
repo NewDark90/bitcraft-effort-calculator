@@ -1,5 +1,4 @@
 
-import { NotificationStyle } from "@/database/tables/settings";
 import { useCallback, useMemo } from "react";
 
 export type UseFormattersReturn = { 

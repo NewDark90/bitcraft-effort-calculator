@@ -1,6 +1,6 @@
 import NumberInput from "@/components/common/number-input";
 import { Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Tooltip } from "@mui/material";
-import React, { useCallback } from "react";
+import React from "react";
 import clsx from "clsx";
 import { TierNumber } from "@/config/tier";
 import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";

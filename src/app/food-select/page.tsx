@@ -4,7 +4,7 @@ import { NoSSR } from 'next-dynamic-no-ssr';
 import { useLiveQuery } from "dexie-react-hooks";
 import { calculatorDatabase, deselectAllEntities, FoodEntity, foodOverrideId, FoodType, foodTypes, selectEntity } from "@/database";
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Switch, Tooltip } from "@mui/material";
-import { ChangeEvent, useCallback, useId, useMemo, useState } from "react";
+import { ChangeEvent, useId, useState } from "react";
 import { TierNumber } from "@/config/tier";
 import TierSelector from "@/components/tier-selector";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';

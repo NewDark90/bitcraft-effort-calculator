@@ -3,15 +3,14 @@ import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
 import { getEffectiveStaminaCost, getStaminaCost } from "@/config/stamina-costs";
 import { TierNumber } from "@/config/tier";
 import { getWorkInterval, getWorkIntervalFromSeconds, WorkInterval } from "@/config/work-intervals";
-import { calculatorDatabase } from "@/database/db";
-import { ArmorEntity, FoodEntity, settingKeys, SkillEntity } from "@/database/tables";
+import { ArmorEntity, FoodEntity, SkillEntity } from "@/database/tables";
 import { useEffectChange } from "@/hooks/use-effect-change";
 import { useServiceWorker } from "@/hooks/use-service-worker";
 import { useSettings } from "@/hooks/use-settings";
 import { useSounds } from "@/hooks/use-sounds";
 import { useWakeLock } from "@/hooks/use-wake-lock";
 import { minmax } from "@/util/minmax";
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useEventListener, useInterval, useLocalStorage } from "usehooks-ts";
 
 
@@ -323,8 +322,6 @@ export const useWorkPlayerInteractivity = (
         doWork,
         workInterval,
         doPassiveStaminaRegen,
-        doWorkBatch,
-        workProgressStats,
         setCurrentStamina,
         currentStamina,
         fullStamina,

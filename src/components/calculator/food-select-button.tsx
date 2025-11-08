@@ -2,7 +2,6 @@ import ButtonLink from "@/components/common/button-link";
 import TierLabel from "@/components/tier-label";
 import { FoodEntity } from "@/database/tables";
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { CraftingTypeSlug } from "@/config/crafting-types";
 import { useTheme } from "@mui/material/styles";
 import { useFormatters } from "@/hooks/use-formatters";
