@@ -1,6 +1,6 @@
 import { craftingTiers } from "@/config/crafting-tiers";
 import { craftingTypes, CraftingTypeSlug } from "@/config/crafting-types";
-import { getStaminaCost } from "@/config/stamina-costs";
+import { getEffectiveStaminaCost, getStaminaCost } from "@/config/stamina-costs";
 import { TierNumber } from "@/config/tier";
 import { getWorkInterval, getWorkIntervalFromSeconds, WorkInterval } from "@/config/work-intervals";
 import { calculatorDatabase } from "@/database/db";
@@ -135,9 +135,12 @@ export const useWorkPlayerState = (
         ? getWorkIntervalFromSeconds(manualInterval)
         : getWorkInterval(craftingType, [armor, food]);
 
+    const staminaPassiveRegenRate = flatStaminaRegenRate + (food?.staminaRegen ?? 0);
+    const staminaActiveRegenRate = food?.activeStaminaRegen ?? 0;
+
     const fullStamina = armor.stamina;
     const staminaCost = getStaminaCost(craftingType, craftingTier);
-    const staminaRegenRate = flatStaminaRegenRate + (food?.staminaRegen ?? 0);
+    const staminaCostEffective = getEffectiveStaminaCost(staminaCost, workInterval.effective, staminaActiveRegenRate)
 
     const setCurrentEffort = (effort: number) => {
         const newEffort = minmax(effort, 0, fullEffort);
@@ -151,6 +154,12 @@ export const useWorkPlayerState = (
         _setFullEffort(newEffort);
     };
 
+    const incrementCurrentStamina = (stamina: number) => {
+        _setCurrentStamina(
+            currentStamina => minmax((currentStamina + stamina), 0, armor.stamina)
+        ); 
+    } 
+
     const restart = () => {
         _setIsWorking(false);
         _setCurrentEffort(0);
@@ -158,24 +167,20 @@ export const useWorkPlayerState = (
     };
 
     const doPassiveStaminaRegen = (ratio: number = 1) => {
-        _setCurrentStamina(currentStamina => {
-            return minmax(currentStamina + (staminaRegenRate * ratio), 0, armor.stamina);
-        });
+        incrementCurrentStamina((staminaPassiveRegenRate + staminaActiveRegenRate) * ratio);
     };
 
     const doWork = (ratio: number = 1) => {
-        let newStamina = currentStamina - (staminaCost * ratio);
-        if (newStamina <= 0) {
+        // While we might have extra stamina after regen, we want to assume the regeneration comes after the work, not before.
+        const staminaAfterIterationRaw = currentStamina - (staminaCost * ratio);
+        if (staminaAfterIterationRaw <= 0) {
             // Stop, not done
             tryPlayAudio("stamina-complete");
             _setIsWorking(false);
             return;
         }
-        const activeRegen = (food?.activeStaminaRegen ?? 0) * workInterval.effective * ratio;
-        newStamina += activeRegen;
-        newStamina = minmax(newStamina, 0, fullStamina)
-        _setCurrentStamina(newStamina); 
 
+        incrementCurrentStamina(staminaCostEffective * ratio * -1);
         const newEffort = setCurrentEffort(currentEffort + (skill.power * ratio));
 
         if (newEffort >= fullEffort) {
@@ -207,8 +212,8 @@ export const useWorkPlayerState = (
         setCurrentEffort(newEffort);
 
         const staminaTicks = Math.floor(timeDelta / 1000);
-        const staminaRegenerated = staminaRegenRate * staminaTicks;
-        _setCurrentStamina(minmax(newStamina + staminaRegenerated, 0, armor.stamina));      
+        const staminaRegenerated = staminaPassiveRegenRate * staminaTicks;
+        incrementCurrentStamina(staminaRegenerated);    
     };
 
 
@@ -217,8 +222,8 @@ export const useWorkPlayerState = (
         //const powerPerSecond = skill.power / workInterval.effective;
 
         // Stamina 
-        const totalStaminaBarIterations = Math.floor(armor.stamina / staminaCost);
-        const remainingStaminaIterations = Math.floor(currentStamina / staminaCost);
+        const totalStaminaBarIterations = Math.floor(armor.stamina / staminaCostEffective);
+        const remainingStaminaIterations = Math.floor(currentStamina / staminaCostEffective);
         const neededStaminaIterations = Math.ceil((fullEffort - currentEffort) / skill.power);
         const fullStaminaIterations = Math.ceil(fullEffort / skill.power);
 
@@ -232,6 +237,7 @@ export const useWorkPlayerState = (
         const fullWorkTimeMs = totalStaminaBarIterations * workInterval.effectiveMs;
 
         //const staminaAfterWorkIterations = currentStamina - (staminaIterations * staminaCost);
+        const staminaRegenRate = (staminaPassiveRegenRate + staminaActiveRegenRate);
         const timeToRegenerateStaminaMs = ((armor.stamina - currentStamina) / staminaRegenRate) * 1000;
         const fullTimeToRegenerateStaminaMs = (armor.stamina / staminaRegenRate) * 1000;
 

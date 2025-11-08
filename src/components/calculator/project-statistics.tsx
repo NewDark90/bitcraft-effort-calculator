@@ -5,6 +5,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import HexagonIcon from '@mui/icons-material/Hexagon';
+import { useFormatters } from "@/hooks/use-formatters";
 
 export type ProjectStatisticsProps = Pick<WorkProgressStats, "projectStats">;
 
@@ -25,6 +26,11 @@ export default function ProjectStatistics({
         staminaRegen
     }
 }: ProjectStatisticsProps) {
+    
+    const { 
+        staminaBarCountFormatter,
+        workTimeFormatter
+    } = useFormatters();
 
     return (
         <div className="flex flex-row flex-wrap justify-evenly items-center [&>*]:my-1">
@@ -33,9 +39,9 @@ export default function ProjectStatistics({
                 tooltipContent={
                     tooltipWrapper("Remaining Work Time / Full Work Time")
                 }
-                left={(workTime.remainingMs / 1000 / 60).toFixed(2)}
-                right={(workTime.fullMs / 1000 / 60).toFixed(2)}
-                suffix={<span className='mx-1'>Minutes</span>}
+                left={workTimeFormatter(workTime.remainingMs / 1000)}
+                right={workTimeFormatter(workTime.fullMs / 1000)}
+                suffix={<span className='mx-1'></span>}
             ></StatisticItem>
 
             <StatisticItem<string>
@@ -48,8 +54,8 @@ export default function ProjectStatistics({
                 tooltipContent={
                     tooltipWrapper("Remaining Stamina Bars to Complete / All Stamina Bars")
                 }
-                left={staminaBar.remaining.toFixed(2)}
-                right={staminaBar.total.toFixed(2)}
+                left={staminaBarCountFormatter.format(staminaBar.remaining)}
+                right={staminaBarCountFormatter.format(staminaBar.total)}
             ></StatisticItem>
 
             <StatisticItem<string>

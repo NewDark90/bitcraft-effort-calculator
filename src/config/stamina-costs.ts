@@ -20,10 +20,21 @@ export const staminaCostTiers = new Map<TierNumber, number>([
 export const staminaCostBuild = 2;
 
 
-export function getStaminaCost(craftType: CraftingTypeSlug, tier: TierNumber): number {
+export function getStaminaCost(
+    craftType: CraftingTypeSlug, 
+    tier: TierNumber,
+): number {
 
     if (craftType == "build")
         return staminaCostBuild;
 
     return staminaCostTiers.get(tier) ?? 0;
+}
+
+export function getEffectiveStaminaCost(
+    staminaCost: number,
+    workInterval: number, 
+    activeStaminaRegen: number
+): number {
+    return staminaCost - (workInterval * activeStaminaRegen);
 }

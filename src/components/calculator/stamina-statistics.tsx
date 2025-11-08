@@ -5,6 +5,7 @@ import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import SkillIcon from "@/components/skill-icon";
 import { Button } from "@mui/material";
+import { useFormatters } from "@/hooks/use-formatters";
 
 export type StaminaStatisticsProps = Pick<WorkProgressStats, 'staminaStats'> & {
     onStaminaFull: () => void;
@@ -29,6 +30,10 @@ export default function StaminaStatistics({
     onStaminaFull
 }: StaminaStatisticsProps) {
 
+    const { 
+        workTimeFormatter
+    } = useFormatters();
+
     return (
         <div className="flex flex-row flex-wrap justify-evenly items-center [&>*]:my-1">
             <StatisticItem<string>
@@ -36,9 +41,9 @@ export default function StaminaStatistics({
                 tooltipContent={
                     tooltipWrapper("Remaining Work Time / Full Work Time")
                 }
-                left={(workTime.remainingMs / 1000 / 60).toFixed(2)}
-                right={(workTime.fullMs / 1000 / 60).toFixed(2)}
-                suffix={<span className='mx-1'>Minutes</span>}
+                left={workTimeFormatter(workTime.remainingMs / 1000)}
+                right={workTimeFormatter(workTime.fullMs / 1000)}
+                suffix={<span className='mx-1'></span>}
             ></StatisticItem>
 
             <StatisticItem<number>
